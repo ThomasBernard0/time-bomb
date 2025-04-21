@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersService } from './users/users.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     AuthModule,
     PrismaModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService],

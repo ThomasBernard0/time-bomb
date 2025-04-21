@@ -8,9 +8,29 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  hostedGames Game[]   @relation("HostRelation")
+  players     Player[]
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  host      User     @relation("HostRelation", fields: [hostId], references: [id])
+  hostId    String
+  players   Player[]
+  status    String   @default("waiting")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+model Player {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
 }
