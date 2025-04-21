@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Stack, Button } from "@mui/material";
-import { joinGameByCode, useFetchPlayers } from "../api/games";
+import { Typography, Stack } from "@mui/material";
+import { useFetchPlayers } from "../api/games";
 import { useAuth } from "../context/AuthContext";
 
 const Lobby: React.FC = () => {
@@ -17,7 +17,7 @@ const Lobby: React.FC = () => {
 
       <Stack spacing={1}>
         {players.map((player) => (
-          <Typography key={player.id}>a</Typography>
+          <Typography key={player.id}>{player.name}</Typography>
         ))}
       </Stack>
     </Stack>
