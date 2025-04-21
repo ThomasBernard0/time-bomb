@@ -78,7 +78,7 @@ export default function AuthPage() {
 
           <Box mt={2} textAlign="center">
             <Typography variant="body2">
-              {isRegister ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
+              {isRegister ? "Déjà un compte ?" : "Pas encore de compte ?"}
               <Link
                 component="button"
                 onClick={() => setIsRegister(!isRegister)}
