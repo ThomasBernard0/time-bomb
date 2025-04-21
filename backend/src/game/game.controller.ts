@@ -1,4 +1,13 @@
-import { Controller, Post, UseGuards, Req, Param, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Req,
+  Param,
+  Get,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GameService } from './game.service';
 @Controller('games')
@@ -10,6 +19,20 @@ export class GameController {
   async create(@Req() req) {
     const userId = req.user.sub;
     return this.gameService.createGame(userId);
+  }
+
+  @Get('verify/:code')
+  async verifyGameCode(@Param('code') code: string) {
+    const game = await this.gameService.verifyGameCode(code);
+    if (!game) {
+      throw new NotFoundException('Code de partie invalide');
+    }
+
+    if (game.status === 'FINISHED') {
+      throw new ForbiddenException('Cette partie est terminée');
+    }
+
+    return game;
   }
 
   @Post('join/:code')

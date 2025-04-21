@@ -9,7 +9,7 @@ import {
   Link,
   Paper,
 } from "@mui/material";
-import api from "../api";
+import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +30,7 @@ export default function AuthPage() {
       const res = await api.post(endpoint, { email, password });
       const token = res.data.access_token;
       login(token);
-      navigate("/lobby");
+      navigate("/hub");
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion");
     }

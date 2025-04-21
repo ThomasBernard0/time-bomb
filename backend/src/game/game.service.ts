@@ -17,9 +17,17 @@ export class GameService {
         host: {
           connect: { id: userId },
         },
+        status: 'WAITING',
       },
     });
     return { code: game.code };
+  }
+
+  async verifyGameCode(code: string) {
+    const game = await this.prisma.game.findUnique({
+      where: { code: code },
+    });
+    return game;
   }
 
   async getPlayersInGame(code: string) {
