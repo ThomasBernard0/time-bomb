@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Player } from "../types";
-import { useAuth } from "../context/AuthContext";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -20,7 +19,7 @@ export const createGame = async (token: string): Promise<{ code: string }> => {
 
 export const verifyGameCode = async (code: string, token: string) => {
   try {
-    const response = await axios.get(`${BASE_URL}/games/verify/${code}`, {
+    const response = await axios.get(`${BASE_URL}/games/${code}/verify`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -39,22 +38,12 @@ export const useFetchPlayers = (code: string, token: string) => {
     const fetchPlayers = async () => {
       if (!code) return;
       try {
-        const response = await fetch(`/api/games/lobby/${code}`, {
-          method: "GET",
+        const response = await axios.get(`${BASE_URL}/games/${code}/players`, {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!response.ok) {
-          throw new Error(
-            "Erreur lors de la récupération des joueurs du lobby"
-          );
-        }
-
-        const data = await response.json();
-        setPlayers(data);
+        setPlayers(response.data);
       } catch (error: any) {
         setError(error.message);
       } finally {

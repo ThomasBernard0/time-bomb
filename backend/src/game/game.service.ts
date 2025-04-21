@@ -20,6 +20,12 @@ export class GameService {
         status: 'WAITING',
       },
     });
+    await this.prisma.player.create({
+      data: {
+        userId,
+        gameId: game.id,
+      },
+    });
     return { code: game.code };
   }
 

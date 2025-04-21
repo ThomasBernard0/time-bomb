@@ -21,7 +21,7 @@ export class GameController {
     return this.gameService.createGame(userId);
   }
 
-  @Get('verify/:code')
+  @Get(':code/verify')
   async verifyGameCode(@Param('code') code: string) {
     const game = await this.gameService.verifyGameCode(code);
     if (!game) {
@@ -35,7 +35,7 @@ export class GameController {
     return game;
   }
 
-  @Post('join/:code')
+  @Post(':code/join')
   async joinGame(@Param('code') code: string, @Req() req) {
     const userId = req.user.sub;
     return this.gameService.joinGame(code, userId);
