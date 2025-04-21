@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createGame, verifyGameCode } from "../api/games";
+import { createGame, joinGameByCode, verifyGameCode } from "../api/games";
 import { Button, TextField, Stack, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
@@ -25,6 +25,7 @@ const Hub: React.FC = () => {
     try {
       const exists = await verifyGameCode(code, token);
       if (exists) {
+        await joinGameByCode(code, token);
         navigate(`/lobby/${code}`);
       } else {
         setError("Code de partie invalide.");

@@ -10,10 +10,6 @@ const Lobby: React.FC = () => {
   if (!code || !token) return;
   const { players, loading, error } = useFetchPlayers(code, token);
 
-  const handleJoin = () => {
-    joinGameByCode(code, token);
-  };
-
   if (loading) return <div>Chargement...</div>;
   return (
     <Stack spacing={3} alignItems="center" mt={5}>
@@ -24,10 +20,6 @@ const Lobby: React.FC = () => {
           <Typography key={player.id}>a</Typography>
         ))}
       </Stack>
-
-      <Button variant="contained" color="primary" onClick={handleJoin}>
-        Rejoindre la partie
-      </Button>
     </Stack>
   );
 };
