@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class GameService {
   constructor(private prisma: PrismaService) {}
 
-  async createGame(userId: string) {
+  async createGame(userId: string, name: string) {
     const code = Math.random().toString(36).substr(2, 6).toUpperCase();
     const game = await this.prisma.game.create({
       data: {
@@ -23,6 +23,7 @@ export class GameService {
     await this.prisma.player.create({
       data: {
         userId,
+        name,
         gameId: game.id,
       },
     });
@@ -53,7 +54,7 @@ export class GameService {
     return game.players;
   }
 
-  async joinGame(code: string, userId: string) {
+  async joinGame(code: string, userId: string, name: string) {
     const game = await this.prisma.game.findUnique({
       where: { code },
     });
@@ -76,6 +77,7 @@ export class GameService {
     await this.prisma.player.create({
       data: {
         userId,
+        name,
         gameId: game.id,
       },
     });

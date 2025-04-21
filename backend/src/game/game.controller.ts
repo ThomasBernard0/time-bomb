@@ -7,6 +7,7 @@ import {
   Get,
   NotFoundException,
   ForbiddenException,
+  Body,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GameService } from './game.service';
@@ -16,9 +17,9 @@ export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Post()
-  async create(@Req() req) {
+  async create(@Req() req, @Body('name') name: string) {
     const userId = req.user.sub;
-    return this.gameService.createGame(userId);
+    return this.gameService.createGame(userId, name);
   }
 
   @Get(':code/verify')
@@ -36,9 +37,13 @@ export class GameController {
   }
 
   @Post(':code/join')
-  async joinGame(@Param('code') code: string, @Req() req) {
+  async joinGame(
+    @Param('code') code: string,
+    @Req() req,
+    @Body('name') name: string,
+  ) {
     const userId = req.user.sub;
-    return this.gameService.joinGame(code, userId);
+    return this.gameService.joinGame(code, userId, name);
   }
 
   @Get(':code/players')

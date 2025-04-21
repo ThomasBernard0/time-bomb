@@ -14,7 +14,7 @@ const Hub: React.FC = () => {
   const handleCreateGame = async () => {
     if (!token) return;
     try {
-      const game = await createGame(token);
+      const game = await createGame(username, token);
       navigate(`/lobby/${game.code}`);
     } catch (err) {
       setError("Erreur lors de la création de la partie.");
@@ -26,7 +26,7 @@ const Hub: React.FC = () => {
     try {
       const exists = await verifyGameCode(code, token);
       if (exists) {
-        await joinGameByCode(code, token);
+        await joinGameByCode(code, username, token);
         navigate(`/lobby/${code}`);
       } else {
         setError("Code de partie invalide.");

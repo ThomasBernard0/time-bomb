@@ -20,6 +20,7 @@ CREATE TABLE "Game" (
 -- CreateTable
 CREATE TABLE "Player" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "gameId" TEXT NOT NULL,
     CONSTRAINT "Player_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,

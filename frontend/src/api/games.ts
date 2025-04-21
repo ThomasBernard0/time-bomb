@@ -4,10 +4,13 @@ import { Player } from "../types";
 
 const BASE_URL = "http://localhost:3000";
 
-export const createGame = async (token: string): Promise<{ code: string }> => {
+export const createGame = async (
+  username: string,
+  token: string
+): Promise<{ code: string }> => {
   const res = await axios.post(
     `${BASE_URL}/games`,
-    {},
+    { name: username },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,6 +30,27 @@ export const verifyGameCode = async (code: string, token: string) => {
     return response.data;
   } catch (error) {
     throw new Error("Code de partie invalide ou partie terminée");
+  }
+};
+
+export const joinGameByCode = async (
+  code: string,
+  username: string,
+  token: string
+): Promise<boolean> => {
+  try {
+    await axios.post(
+      `${BASE_URL}/games/${code}/join`,
+      { name: username },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
   }
 };
 
@@ -53,24 +77,4 @@ export const useFetchPlayers = (code: string, token: string) => {
     fetchPlayers();
   }, [code]);
   return { players, loading, error };
-};
-
-export const joinGameByCode = async (
-  code: string,
-  token: string
-): Promise<boolean> => {
-  try {
-    await axios.post(
-      `${BASE_URL}/games/${code}/join`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return true;
-  } catch (error) {
-    return false;
-  }
 };
