@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Hub: React.FC = () => {
   const { token } = useAuth();
+  const [username, setUsername] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -39,7 +40,18 @@ const Hub: React.FC = () => {
     <Stack spacing={3} alignItems="center" mt={8}>
       <Typography variant="h4">Bienvenue dans Time Bomb 💣</Typography>
 
-      <Button variant="contained" color="primary" onClick={handleCreateGame}>
+      <TextField
+        label="Nom"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={!username}
+        onClick={handleCreateGame}
+      >
         Créer une partie
       </Button>
 
@@ -48,7 +60,12 @@ const Hub: React.FC = () => {
         value={code}
         onChange={(e) => setCode(e.target.value)}
       />
-      <Button variant="outlined" onClick={handleJoinGame}>
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={!code || !username}
+        onClick={handleJoinGame}
+      >
         Rejoindre
       </Button>
 
