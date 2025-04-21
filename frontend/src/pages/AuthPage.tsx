@@ -10,8 +10,12 @@ import {
   Paper,
 } from "@mui/material";
 import api from "../api";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,8 +29,8 @@ export default function AuthPage() {
       const endpoint = isRegister ? "/auth/register" : "/auth/login";
       const res = await api.post(endpoint, { email, password });
       const token = res.data.access_token;
-      localStorage.setItem("token", token);
-      alert("Connexion réussie ✅");
+      login(token);
+      navigate("/lobby");
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion");
     }
