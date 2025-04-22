@@ -4,10 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GameState } from './game.state';
 
 @Injectable()
 export class GameService {
   constructor(private prisma: PrismaService) {}
+
+  private games: { [gameCode: string]: GameState } = {};
 
   async createGame(userId: string, name: string) {
     const code = Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -83,5 +86,14 @@ export class GameService {
     });
 
     return { code: game.code };
+  }
+
+  startGame(gameCode: string) {
+    const game = this.games[gameCode];
+
+    if (!game) {
+      throw new Error('Game not found');
+    }
+    game.startGame();
   }
 }

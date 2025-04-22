@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Player } from "../types";
+import { GameState } from "../types";
 import socket from "../socket";
 
 const BASE_URL = "http://localhost:3000";
@@ -55,16 +55,16 @@ export const joinGameByCode = async (
   }
 };
 
-export const usePlayersSocket = (gameCode: string) => {
-  const [players, setPlayers] = useState<Player[]>([]);
+export const useGameStateSocket = (gameCode: string) => {
+  const [gameState, setGameState] = useState<GameState>();
 
   useEffect(() => {
     if (!gameCode) return;
 
     socket.emit("join-room", { gameCode });
 
-    socket.on("players-update", (updatedPlayers: Player[]) => {
-      setPlayers(updatedPlayers);
+    socket.on("game-update", (updatedGameState: GameState) => {
+      setGameState(updatedGameState);
     });
 
     return () => {
@@ -72,5 +72,5 @@ export const usePlayersSocket = (gameCode: string) => {
     };
   }, [gameCode]);
 
-  return { players };
+  return { gameState };
 };

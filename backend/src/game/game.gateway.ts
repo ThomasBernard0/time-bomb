@@ -1,50 +1,90 @@
 import {
-  SubscribeMessage,
   WebSocketGateway,
+  SubscribeMessage,
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { GameState } from './game.state';
 import { GameService } from './game.service';
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-})
+@WebSocketGateway({ cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(private gameService: GameService) {}
 
-  private logger: Logger = new Logger('GameGateway');
+  private games: Map<string, GameState> = new Map();
+  private socketToPlayer: Map<string, { gameId: string; playerId: string }> =
+    new Map();
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
+  handleConnection(socket: Socket) {
+    console.log(`Client connected: ${socket.id}`);
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+  handleDisconnect(socket: Socket) {
+    console.log(`Client disconnected: ${socket.id}`);
+    this.socketToPlayer.delete(socket.id);
   }
 
-  @SubscribeMessage('join-room')
-  handleJoinRoom(
-    @MessageBody() data: { gameCode: string },
-    @ConnectedSocket() client: Socket,
+  @SubscribeMessage('join-game')
+  handleJoin(
+    socket: Socket,
+    payload: { gameId: string; playerId: string; playerName: string },
   ) {
-    const { gameCode } = data;
-    client.join(gameCode);
-    client.data.gameCode = gameCode;
-    this.emitPlayersUpdate(gameCode);
+    let game = this.games.get(payload.gameId);
+    if (!game) {
+      game = new GameState(payload.gameId);
+      this.games.set(payload.gameId, game);
+    }
+
+    game.addPlayer({ id: payload.playerId, name: payload.playerName });
+    this.socketToPlayer.set(socket.id, {
+      gameId: payload.gameId,
+      playerId: payload.playerId,
+    });
+    socket.join(payload.gameId);
+    this.emitGameState(game);
   }
 
-  async emitPlayersUpdate(gameCode: string) {
-    const players = await this.gameService.getPlayersInGame(gameCode);
-    this.server.to(gameCode).emit('players-update', players);
+  @SubscribeMessage('start-game')
+  handleStartGame(socket: Socket, data: { gameCode: string }) {
+    const context = this.socketToPlayer.get(socket.id);
+    if (!context) return;
+
+    const game = this.games.get(context.gameId);
+    if (!game) return;
+
+    const { gameCode } = data;
+    this.gameService.startGame(gameCode);
+    this.emitGameState(game);
+  }
+
+  @SubscribeMessage('reveal-card')
+  handleReveal(socket: Socket, payload: { cardId: string }) {
+    const context = this.socketToPlayer.get(socket.id);
+    if (!context) return;
+
+    const game = this.games.get(context.gameId);
+    if (!game) return;
+
+    game.revealCard(payload.cardId);
+    this.emitGameState(game);
+  }
+
+  private emitGameState(game: GameState) {
+    for (const [
+      socketId,
+      { gameId, playerId },
+    ] of this.socketToPlayer.entries()) {
+      if (game.gameId === gameId) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        if (socket) {
+          socket.emit('game-updated', game.getVisibleStateFor(playerId));
+        }
+      }
+    }
   }
 }
