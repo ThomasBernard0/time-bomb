@@ -16,6 +16,7 @@ const Lobby: React.FC = () => {
   };
 
   if (!gameState) return;
+  console.log(gameState);
 
   return (
     <Stack spacing={3} alignItems="center" mt={5}>

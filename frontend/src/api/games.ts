@@ -60,15 +60,12 @@ export const useGameStateSocket = (gameCode: string) => {
 
   useEffect(() => {
     if (!gameCode) return;
-
-    socket.emit("join-room", { gameCode });
-
-    socket.on("game-update", (updatedGameState: GameState) => {
+    socket.on("game-updated", (updatedGameState: GameState) => {
       setGameState(updatedGameState);
     });
-
+    socket.emit("join-game", { gameCode });
     return () => {
-      socket.off("players-update");
+      socket.off("game-updated");
     };
   }, [gameCode]);
 
