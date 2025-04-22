@@ -41,17 +41,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     let player = await this.gameService.getPlayerByUserIdAndCode(code, user.id);
+
     let game = this.games.get(code);
     if (!game) {
       game = new GameState(code);
       this.games.set(code, game);
     }
-    game.addPlayer({ id: player.id, name: player.name });
+
+    const playerExistsInState = game.players.some((p) => p.id === player.id);
+
+    if (!playerExistsInState) {
+      game.addPlayer({ id: player.id, name: player.name });
+    }
+
     this.socketToPlayer.set(socket.id, {
       code: code,
       playerId: player.id,
     });
     socket.join(code);
+
     this.emitGameState(game);
   }
 
