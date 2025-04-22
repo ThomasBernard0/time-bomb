@@ -68,9 +68,6 @@ export class GameState {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
     card.revealed = true;
-    if (card.color === 'green') {
-      this.foundGreenCards.push(card);
-    }
   }
 
   getVisibleStateFor(playerId: string) {

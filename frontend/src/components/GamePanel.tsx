@@ -42,7 +42,12 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         sx={{ transform: "translateX(-50%)" }}
       >
         {playerCards.map((c) => (
-          <CardDisplayer key={c.id} card={c} playedId={gameState.playerId} />
+          <CardDisplayer
+            key={c.id}
+            card={c}
+            playedId={gameState.playerId}
+            code={gameState.code}
+          />
         ))}
       </Box>
 
@@ -70,6 +75,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
                   key={c.id}
                   card={c}
                   playedId={gameState.playerId}
+                  code={gameState.code}
                 />
               ))}
             </Box>
