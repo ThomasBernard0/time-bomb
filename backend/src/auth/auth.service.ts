@@ -35,4 +35,17 @@ export class AuthService {
     const user = await this.usersService.create(email, hashedPassword);
     return this.login(user);
   }
+
+  async validateToken(token: string): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      const user = await this.usersService.findById(decoded.sub);
+      if (!user) {
+        throw new ForbiddenException('Invalid user');
+      }
+      return user;
+    } catch (e) {
+      throw new ForbiddenException('Invalid or expired token');
+    }
+  }
 }

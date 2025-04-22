@@ -9,7 +9,7 @@ const Lobby: React.FC = () => {
   const { token } = useAuth();
   const { code } = useParams<{ code: string }>();
   if (!code || !token) return null;
-  const { gameState } = useGameStateSocket(code);
+  const { gameState } = useGameStateSocket(code, token);
 
   const startGame = () => {
     socket.emit("start-game", { gameCode: code });

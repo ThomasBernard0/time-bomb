@@ -13,15 +13,15 @@ export interface Player {
 }
 
 export class GameState {
-  gameId: string;
+  code: string;
   players: Player[] = [];
   cards: Card[] = [];
-  round: number = 1;
+  round: number;
   foundGreenCards: Card[] = [];
   status: string;
 
-  constructor(gameId: string) {
-    this.gameId = gameId;
+  constructor(code: string) {
+    this.code = code;
   }
 
   addPlayer(player: Player) {
@@ -69,8 +69,8 @@ export class GameState {
   }
 
   getVisibleStateFor(playerId: string) {
-    return {
-      gameId: this.gameId,
+    const test = {
+      code: this.code,
       round: this.round,
       players: this.players,
       foundGreenCards: this.foundGreenCards,
@@ -90,5 +90,7 @@ export class GameState {
         }
       }),
     };
+    console.log(test);
+    return test;
   }
 }

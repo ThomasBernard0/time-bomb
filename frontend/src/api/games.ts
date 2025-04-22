@@ -55,19 +55,19 @@ export const joinGameByCode = async (
   }
 };
 
-export const useGameStateSocket = (gameCode: string) => {
+export const useGameStateSocket = (code: string, token: string) => {
   const [gameState, setGameState] = useState<GameState>();
 
   useEffect(() => {
-    if (!gameCode) return;
+    if (!code) return;
     socket.on("game-updated", (updatedGameState: GameState) => {
       setGameState(updatedGameState);
     });
-    socket.emit("join-game", { gameCode });
+    socket.emit("join-game", { code, token });
     return () => {
       socket.off("game-updated");
     };
-  }, [gameCode]);
+  }, [code, token]);
 
   return { gameState };
 };

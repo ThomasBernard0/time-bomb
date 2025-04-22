@@ -8,16 +8,20 @@ import {
 import { Server, Socket } from 'socket.io';
 import { GameState } from './game.state';
 import { GameService } from './game.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private gameService: GameService) {}
+  constructor(
+    private gameService: GameService,
+    private authService: AuthService,
+  ) {}
 
   private games: Map<string, GameState> = new Map();
-  private socketToPlayer: Map<string, { gameId: string; playerId: string }> =
+  private socketToPlayer: Map<string, { code: string; playerId: string }> =
     new Map();
 
   handleConnection(socket: Socket) {
@@ -30,22 +34,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join-game')
-  handleJoin(
-    socket: Socket,
-    payload: { gameId: string; playerId: string; playerName: string },
-  ) {
-    let game = this.games.get(payload.gameId);
-    if (!game) {
-      game = new GameState(payload.gameId);
-      this.games.set(payload.gameId, game);
+  async handleJoin(socket: Socket, data: { token: string; code: string }) {
+    const { token, code } = data;
+    const user = await this.authService.validateToken(token);
+    if (!user) {
+      return;
     }
-
-    game.addPlayer({ id: payload.playerId, name: payload.playerName });
+    let player = await this.gameService.getPlayerByUserIdAndCode(code, user.id);
+    let game = this.games.get(code);
+    if (!game) {
+      game = new GameState(code);
+      this.games.set(code, game);
+    }
+    game.addPlayer({ id: player.id, name: player.name });
     this.socketToPlayer.set(socket.id, {
-      gameId: payload.gameId,
-      playerId: payload.playerId,
+      code: code,
+      playerId: player.id,
     });
-    socket.join(payload.gameId);
+    socket.join(code);
     this.emitGameState(game);
   }
 
@@ -54,7 +60,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const context = this.socketToPlayer.get(socket.id);
     if (!context) return;
 
-    const game = this.games.get(context.gameId);
+    const game = this.games.get(context.code);
     if (!game) return;
 
     const { gameCode } = data;
@@ -67,7 +73,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const context = this.socketToPlayer.get(socket.id);
     if (!context) return;
 
-    const game = this.games.get(context.gameId);
+    const game = this.games.get(context.code);
     if (!game) return;
 
     game.revealCard(payload.cardId);
@@ -77,9 +83,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private emitGameState(game: GameState) {
     for (const [
       socketId,
-      { gameId, playerId },
+      { code, playerId },
     ] of this.socketToPlayer.entries()) {
-      if (game.gameId === gameId) {
+      if (game.code === code) {
         const socket = this.server.sockets.sockets.get(socketId);
         if (socket) {
           socket.emit('game-updated', game.getVisibleStateFor(playerId));

@@ -57,6 +57,21 @@ export class GameService {
     return game.players;
   }
 
+  async getPlayerByUserIdAndCode(code: string, userId: string) {
+    const player = await this.prisma.player.findFirst({
+      where: {
+        game: {
+          code: code,
+        },
+        userId: userId,
+      },
+    });
+    if (!player) {
+      throw new NotFoundException('Joueur introuvable.');
+    }
+    return player;
+  }
+
   async joinGame(code: string, userId: string, name: string) {
     const game = await this.prisma.game.findUnique({
       where: { code },
