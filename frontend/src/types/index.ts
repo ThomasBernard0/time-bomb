@@ -8,21 +8,17 @@ export interface Card {
 }
 
 export type GameState = {
-  gameId: string;
+  code: string;
+  status: string;
   players: Player[];
   playerId: string;
-  cards: Card[];
-  round: number;
   foundGreenCards: Card[];
-  status: string;
+  cards: Card[];
 };
 
 export type Player = {
   id: string;
   name: string;
-  userId: string;
-  gameId: string;
-  isReady: boolean;
 };
 
 export type User = {

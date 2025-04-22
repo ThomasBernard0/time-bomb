@@ -41,6 +41,7 @@ const Lobby: React.FC = () => {
 
   console.log(playerCards);
   console.log(otherPlayersCards);
+  console.log(gameState);
 
   return (
     <Stack spacing={3} alignItems="center" mt={5}>

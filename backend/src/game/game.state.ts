@@ -76,7 +76,7 @@ export class GameState {
   getVisibleStateFor(playerId: string) {
     return {
       code: this.code,
-      round: this.round,
+      status: this.status,
       players: this.players,
       playerId,
       foundGreenCards: this.foundGreenCards,
