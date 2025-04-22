@@ -6,7 +6,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameState } from './game.state';
+import { GameState, Player } from './game.state';
 import { GameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
 
@@ -48,9 +48,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.games.set(code, game);
     }
 
-    const playerExistsInState = game.players.some((p) => p.id === player.id);
-
-    if (!playerExistsInState) {
+    const playerInState: Player = game.players.find((p) => p.id === player.id);
+    console.log(playerInState);
+    if (playerInState) {
+      if (playerInState.name !== player.name) {
+        playerInState.name = player.name;
+      }
+    } else {
       game.addPlayer({ id: player.id, name: player.name });
     }
 
