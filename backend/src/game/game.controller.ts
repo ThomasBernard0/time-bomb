@@ -45,9 +45,4 @@ export class GameController {
     const userId = req.user.sub;
     return this.gameService.joinGame(code, userId, name);
   }
-
-  @Get(':code/players')
-  async getPlayers(@Param('code') code: string) {
-    return this.gameService.getPlayersInGame(code);
-  }
 }

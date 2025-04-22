@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Player } from "../types";
+import socket from "../socket";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -54,27 +55,22 @@ export const joinGameByCode = async (
   }
 };
 
-export const useFetchPlayers = (code: string, token: string) => {
+export const usePlayersSocket = (gameCode: string) => {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchPlayers = async () => {
-      if (!code) return;
-      try {
-        const response = await axios.get(`${BASE_URL}/games/${code}/players`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setPlayers(response.data);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
+    if (!gameCode) return;
+
+    socket.emit("join-room", { gameCode });
+
+    socket.on("players-update", (updatedPlayers: Player[]) => {
+      setPlayers(updatedPlayers);
+    });
+
+    return () => {
+      socket.off("players-update");
     };
-    fetchPlayers();
-  }, [code]);
-  return { players, loading, error };
+  }, [gameCode]);
+
+  return { players };
 };
