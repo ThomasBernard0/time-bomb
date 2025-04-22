@@ -81,19 +81,17 @@ export class GameService {
       throw new NotFoundException('Partie introuvable.');
     }
 
-    const existing = await this.prisma.player.findFirst({
+    await this.prisma.player.upsert({
       where: {
-        userId,
-        gameId: game.id,
+        userId_gameId: {
+          userId: userId,
+          gameId: game.id,
+        },
       },
-    });
-
-    if (existing) {
-      throw new ConflictException('Vous êtes déjà dans la partie.');
-    }
-
-    await this.prisma.player.create({
-      data: {
+      update: {
+        name,
+      },
+      create: {
         userId,
         name,
         gameId: game.id,
