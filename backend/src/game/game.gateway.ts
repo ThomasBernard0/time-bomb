@@ -10,6 +10,11 @@ import { GameState, Player } from './game.state';
 import { GameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
 
+export interface socketsValues {
+  socketId: string;
+  playerId: string;
+}
+
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -20,9 +25,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private authService: AuthService,
   ) {}
 
-  private games: Map<string, GameState> = new Map();
-  private socketToPlayer: Map<string, { code: string; playerId: string }> =
-    new Map();
+  private gamesSockets: Map<string, socketsValues[]> = new Map();
 
   handleConnection(socket: Socket) {
     console.log(`Client connected: ${socket.id}`);
@@ -30,7 +33,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(socket: Socket) {
     console.log(`Client disconnected: ${socket.id}`);
-    this.socketToPlayer.delete(socket.id);
   }
 
   @SubscribeMessage('join-game')
@@ -42,14 +44,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     let player = await this.gameService.getPlayerByUserIdAndCode(code, user.id);
 
-    let game = this.games.get(code);
-    if (!game) {
-      game = new GameState(code);
-      this.games.set(code, game);
-    }
+    let game = this.gameService.getOrCreateGame(code);
 
     const playerInState: Player = game.players.find((p) => p.id === player.id);
-    console.log(playerInState);
     if (playerInState) {
       if (playerInState.name !== player.name) {
         playerInState.name = player.name;
@@ -58,50 +55,46 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       game.addPlayer({ id: player.id, name: player.name });
     }
 
-    this.socketToPlayer.set(socket.id, {
-      code: code,
-      playerId: player.id,
-    });
+    const existingSockets = this.gamesSockets.get(code) || [];
+    const existSocket = existingSockets.some((p) => p.socketId === socket.id);
+    if (!existSocket) {
+      this.gamesSockets.set(code, [
+        ...existingSockets,
+        {
+          socketId: socket.id,
+          playerId: player.id,
+        },
+      ]);
+    }
     socket.join(code);
 
-    this.emitGameState(game);
+    this.emitGameState(game, code);
   }
 
   @SubscribeMessage('start-game')
-  handleStartGame(socket: Socket, data: { gameCode: string }) {
-    const context = this.socketToPlayer.get(socket.id);
-    if (!context) return;
-
-    const game = this.games.get(context.code);
+  handleStartGame(socket: Socket, data: { code: string }) {
+    const { code } = data;
+    let game = this.gameService.getOrCreateGame(code);
     if (!game) return;
-
-    const { gameCode } = data;
-    this.gameService.startGame(gameCode);
-    this.emitGameState(game);
+    this.gameService.startGame(code);
+    this.emitGameState(game, code);
   }
 
   @SubscribeMessage('reveal-card')
-  handleReveal(socket: Socket, payload: { cardId: string }) {
-    const context = this.socketToPlayer.get(socket.id);
-    if (!context) return;
-
-    const game = this.games.get(context.code);
+  handleReveal(socket: Socket, data: { code: string; cardId: string }) {
+    const { code, cardId } = data;
+    let game = this.gameService.getOrCreateGame(code);
     if (!game) return;
 
-    game.revealCard(payload.cardId);
-    this.emitGameState(game);
+    game.revealCard(cardId);
+    this.emitGameState(game, code);
   }
 
-  private emitGameState(game: GameState) {
-    for (const [
-      socketId,
-      { code, playerId },
-    ] of this.socketToPlayer.entries()) {
-      if (game.code === code) {
-        const socket = this.server.sockets.sockets.get(socketId);
-        if (socket) {
-          socket.emit('game-updated', game.getVisibleStateFor(playerId));
-        }
+  private emitGameState(game: GameState, code: string) {
+    for (const { socketId, playerId } of this.gamesSockets.get(code)) {
+      const socket = this.server.sockets.sockets.get(socketId);
+      if (socket) {
+        socket.emit('game-updated', game.getVisibleStateFor(playerId));
       }
     }
   }

@@ -10,7 +10,7 @@ import { GameState } from './game.state';
 export class GameService {
   constructor(private prisma: PrismaService) {}
 
-  private games: { [gameCode: string]: GameState } = {};
+  private games: Map<string, GameState> = new Map();
 
   async createGame(userId: string, name: string) {
     const code = Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -101,12 +101,28 @@ export class GameService {
     return { code: game.code };
   }
 
-  startGame(gameCode: string) {
-    const game = this.games[gameCode];
-
+  startGame(code: string) {
+    const game = this.games.get(code);
     if (!game) {
       throw new Error('Game not found');
     }
     game.startGame();
+  }
+
+  getOrCreateGame(code: string): GameState {
+    let game = this.games.get(code);
+    if (!game) {
+      game = new GameState(code);
+      this.games.set(code, game);
+    }
+    return game;
+  }
+
+  getGame(code: string): GameState | undefined {
+    return this.games.get(code);
+  }
+
+  removeGame(code: string) {
+    this.games.delete(code);
   }
 }

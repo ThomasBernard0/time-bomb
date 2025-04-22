@@ -30,11 +30,12 @@ export class GameState {
 
   startGame() {
     this.status = 'in-progress';
+    this.round = 1;
     this.distributeCards();
   }
 
   distributeCards() {
-    const allCards = [
+    const cardsColor = [
       'green',
       'green',
       'green',
@@ -42,13 +43,17 @@ export class GameState {
       'red',
       ...Array(15).fill('white'),
     ];
-    const shuffledCards = this.shuffleArray(allCards);
-
-    let index = 0;
-    this.players.forEach((playerId) => {
-      this.cards[playerId.id] = shuffledCards.slice(index, index + 5);
-      index += 5;
-    });
+    const shuffledCardsColor = this.shuffleArray(cardsColor);
+    const newCards: Card[] = [];
+    for (let i = 0; i < 20; i++) {
+      newCards.push({
+        id: i.toString(),
+        color: shuffledCardsColor[i],
+        ownerId: this.players[i % this.players.length].id,
+        revealed: false,
+      });
+    }
+    this.cards = newCards;
   }
 
   shuffleArray(array: any[]) {
@@ -69,28 +74,29 @@ export class GameState {
   }
 
   getVisibleStateFor(playerId: string) {
-    const test = {
+    return {
       code: this.code,
       round: this.round,
       players: this.players,
+      playerId,
       foundGreenCards: this.foundGreenCards,
       cards: this.cards.map((card) => {
         if (card.revealed || card.ownerId === playerId) {
           return {
             id: card.id,
             color: card.color,
+            ownerId: card.ownerId,
             revealed: card.revealed,
           };
         } else {
           return {
             id: card.id,
             color: null,
+            ownerId: card.ownerId,
             revealed: false,
           };
         }
       }),
     };
-    console.log(test);
-    return test;
   }
 }

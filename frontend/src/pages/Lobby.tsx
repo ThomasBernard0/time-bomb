@@ -4,6 +4,7 @@ import { Typography, Stack, Button } from "@mui/material";
 import { useGameStateSocket } from "../api/games";
 import { useAuth } from "../context/AuthContext";
 import socket from "../socket";
+import { Card } from "../types";
 
 const Lobby: React.FC = () => {
   const { token } = useAuth();
@@ -11,12 +12,35 @@ const Lobby: React.FC = () => {
   if (!code || !token) return null;
   const { gameState } = useGameStateSocket(code, token);
 
+  const getPlayerCards = () => {
+    return gameState?.cards.filter(
+      (card) => card.ownerId == gameState.playerId
+    );
+  };
+
+  const groupCardsByUser = (): Record<string, Card[]> | undefined => {
+    return gameState?.cards.reduce((acc, card) => {
+      if (card.ownerId === gameState?.playerId) return acc;
+
+      if (!acc[card.ownerId]) {
+        acc[card.ownerId] = [];
+      }
+      acc[card.ownerId].push(card);
+      return acc;
+    }, {} as Record<string, Card[]>);
+  };
+
   const startGame = () => {
-    socket.emit("start-game", { gameCode: code });
+    socket.emit("start-game", { code });
   };
 
   if (!gameState) return;
-  console.log(gameState);
+
+  const playerCards = getPlayerCards();
+  const otherPlayersCards = groupCardsByUser();
+
+  console.log(playerCards);
+  console.log(otherPlayersCards);
 
   return (
     <Stack spacing={3} alignItems="center" mt={5}>

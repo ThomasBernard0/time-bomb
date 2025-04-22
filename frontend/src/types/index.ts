@@ -10,6 +10,7 @@ export interface Card {
 export type GameState = {
   gameId: string;
   players: Player[];
+  playerId: string;
   cards: Card[];
   round: number;
   foundGreenCards: Card[];
