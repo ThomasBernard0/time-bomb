@@ -112,7 +112,10 @@ export class GameService {
   handleReveal(game: GameState, cardId: string) {
     game.revealCard(cardId);
     game.checkSherlockWin();
-    return game.revealed == game.players.length;
+    return (
+      game.revealed == game.players.length &&
+      game.players.length != game.foundGreenCards
+    );
   }
 
   handleEndOfRound(game: GameState) {
