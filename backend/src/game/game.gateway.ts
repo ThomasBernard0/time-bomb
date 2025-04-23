@@ -42,17 +42,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!user) {
       return;
     }
+
     let player = await this.gameService.getPlayerByUserIdAndCode(code, user.id);
-
     let game = this.gameService.getOrCreateGame(code);
-
     const playerInState: Player = game.players.find((p) => p.id === player.id);
     if (playerInState) {
       if (playerInState.name !== player.name) {
         playerInState.name = player.name;
       }
     } else {
-      game.addPlayer({ id: player.id, name: player.name });
+      game.addPlayer({ id: player.id, name: player.name, role: null });
     }
 
     const existingSockets = this.gamesSockets.get(code) || [];
@@ -76,7 +75,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { code } = data;
     let game = this.gameService.getOrCreateGame(code);
     if (!game) return;
+
     this.gameService.startGame(code);
+
     this.emitGameState(game, code);
   }
 
@@ -89,7 +90,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .get(code)
       .find((p) => p.socketId === socket.id).playerId;
     if (playerId != game.playerTurnId) return;
-    game.revealCard(cardId);
+
+    this.gameService.handleReveal(game, cardId);
+
     this.emitGameState(game, code);
   }
 
