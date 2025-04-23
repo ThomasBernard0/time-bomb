@@ -15,6 +15,7 @@ export interface Player {
 export class GameState {
   code: string;
   players: Player[] = [];
+  playerTurnId: string;
   cards: Card[] = [];
   round: number;
   foundGreenCards: Card[] = [];
@@ -64,10 +65,11 @@ export class GameState {
     return array;
   }
 
-  revealCard(cardId: string) {
+  revealCard(cardId: string, playerId: string) {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
     card.revealed = true;
+    this.playerTurnId = playerId;
   }
 
   getVisibleStateFor(playerId: string) {

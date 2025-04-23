@@ -85,8 +85,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { code, cardId } = data;
     let game = this.gameService.getOrCreateGame(code);
     if (!game) return;
-
-    game.revealCard(cardId);
+    const playerId = this.gamesSockets
+      .get(code)
+      .find((p) => p.socketId === socket.id).playerId;
+    if (playerId != game.playerTurnId) return;
+    game.revealCard(cardId, playerId);
     this.emitGameState(game, code);
   }
 
