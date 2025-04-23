@@ -71,11 +71,11 @@ export class GameState {
     return copy;
   }
 
-  revealCard(cardId: string, playerId: string) {
+  revealCard(cardId: string) {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
     card.revealed = true;
-    this.playerTurnId = playerId;
+    this.playerTurnId = card.ownerId;
   }
 
   getVisibleStateFor(playerId: string) {

@@ -89,7 +89,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .get(code)
       .find((p) => p.socketId === socket.id).playerId;
     if (playerId != game.playerTurnId) return;
-    game.revealCard(cardId, playerId);
+    game.revealCard(cardId);
     this.emitGameState(game, code);
   }
 
