@@ -90,10 +90,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .get(code)
       .find((p) => p.socketId === socket.id).playerId;
     if (playerId != game.playerTurnId) return;
+    if (game.revealed == game.players.length) return;
 
-    this.gameService.handleReveal(game, cardId);
+    const isEndOfRound = this.gameService.handleReveal(game, cardId);
 
     this.emitGameState(game, code);
+
+    if (isEndOfRound) {
+      setTimeout(() => {
+        this.gameService.handleEndOfRound(game);
+        this.emitGameState(game, code);
+      }, 2000);
+    }
   }
 
   private emitGameState(game: GameState, code: string) {

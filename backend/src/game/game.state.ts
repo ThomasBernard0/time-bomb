@@ -24,6 +24,7 @@ export class GameState {
   round: number;
   foundGreenCards: number;
   status: string;
+  winner: Role;
 
   constructor(code: string) {
     this.code = code;
@@ -90,13 +91,6 @@ export class GameState {
     });
   }
 
-  countGreen() {
-    const revealedCards = this.cards.filter((card) => card.revealed);
-    revealedCards.forEach((revealedCard) => {
-      if (revealedCard.color == 'green') this.foundGreenCards++;
-    });
-  }
-
   shuffleArray(array: any[]) {
     const copy = [...array];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -109,9 +103,35 @@ export class GameState {
   revealCard(cardId: string) {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
+    if (card.color == 'green') this.foundGreenCards++;
+    if (card.color == 'red') {
+      this.status = 'ended';
+      this.winner = 'moriarty';
+    }
     card.revealed = true;
     this.revealed++;
     this.playerTurnId = card.ownerId;
+  }
+
+  checkSherlockWin() {
+    if (this.foundGreenCards == this.players.length) {
+      this.status = 'ended';
+      this.winner = 'sherlock';
+    }
+  }
+
+  handleEndOfRound() {
+    this.revealed = 0;
+    this.round++;
+    this.checkedOutOfRound();
+    this.distributeCards();
+  }
+
+  checkedOutOfRound() {
+    if (this.round === 5) {
+      this.status = 'ended';
+      this.winner = 'moriarty';
+    }
   }
 
   getVisibleStateFor(playerId: string) {

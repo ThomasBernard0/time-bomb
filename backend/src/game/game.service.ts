@@ -111,12 +111,12 @@ export class GameService {
 
   handleReveal(game: GameState, cardId: string) {
     game.revealCard(cardId);
-    if (game.revealed == game.players.length) {
-      game.revealed = 0;
-      game.round++;
-      game.countGreen();
-      game.distributeCards();
-    }
+    game.checkSherlockWin();
+    return game.revealed == game.players.length;
+  }
+
+  handleEndOfRound(game: GameState) {
+    game.handleEndOfRound();
   }
 
   getOrCreateGame(code: string): GameState {
