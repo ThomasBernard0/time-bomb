@@ -33,6 +33,7 @@ export class GameState {
     this.status = 'in-progress';
     this.round = 1;
     this.distributeCards();
+    this.setInitialPlayer();
   }
 
   distributeCards() {
@@ -57,12 +58,17 @@ export class GameState {
     this.cards = newCards;
   }
 
+  setInitialPlayer() {
+    this.playerTurnId = this.shuffleArray(this.players)[0].id;
+  }
+
   shuffleArray(array: any[]) {
-    for (let i = array.length - 1; i > 0; i--) {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [copy[i], copy[j]] = [copy[j], copy[i]];
     }
-    return array;
+    return copy;
   }
 
   revealCard(cardId: string, playerId: string) {
