@@ -140,6 +140,7 @@ export class GameState {
       status: this.status,
       players: this.players,
       playerId,
+      playerTurnId: this.playerTurnId,
       role: this.players.find((player) => player.id == playerId).role,
       foundGreenCards: this.foundGreenCards,
       cards: this.cards.map((card) => {

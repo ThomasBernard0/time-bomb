@@ -69,6 +69,9 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             <Typography align="center" variant="subtitle2" mb={1}>
               {player.name}
             </Typography>
+            {gameState.playerTurnId == player.id && (
+              <Typography>TOI</Typography>
+            )}
             <Box display="flex" gap={1}>
               {cards.map((c) => (
                 <CardDisplayer
