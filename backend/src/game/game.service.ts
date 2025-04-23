@@ -111,6 +111,12 @@ export class GameService {
 
   handleReveal(game: GameState, cardId: string) {
     game.revealCard(cardId);
+    if (game.revealed == game.players.length) {
+      game.revealed = 0;
+      game.round++;
+      game.countGreen();
+      game.distributeCards();
+    }
   }
 
   getOrCreateGame(code: string): GameState {

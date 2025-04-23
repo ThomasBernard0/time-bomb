@@ -20,8 +20,9 @@ export class GameState {
   players: Player[] = [];
   playerTurnId: string;
   cards: Card[] = [];
+  revealed: number;
   round: number;
-  foundGreenCards: Card[] = [];
+  foundGreenCards: number;
   status: string;
 
   constructor(code: string) {
@@ -35,23 +36,18 @@ export class GameState {
   startGame() {
     this.status = 'in-progress';
     this.round = 1;
+    this.revealed = 0;
+    this.foundGreenCards = 0;
     this.distributeCards();
     this.setInitialPlayer();
     this.setRoles();
   }
 
   distributeCards() {
-    const cardsColor = [
-      'green',
-      'green',
-      'green',
-      'green',
-      'red',
-      ...Array(15).fill('white'),
-    ];
+    const cardsColor = this.getCardsColor();
     const shuffledCardsColor = this.shuffleArray(cardsColor);
     const newCards: Card[] = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < cardsColor.length; i++) {
       newCards.push({
         id: i.toString(),
         color: shuffledCardsColor[i],
@@ -60,6 +56,20 @@ export class GameState {
       });
     }
     this.cards = newCards;
+  }
+
+  getCardsColor() {
+    const numberOfPlayers = this.players.length;
+    const totalCard = numberOfPlayers * (numberOfPlayers + 2 - this.round);
+    const cardsColor = ['red'];
+    const remainingGreen = numberOfPlayers - this.foundGreenCards;
+    for (let i = 0; i < remainingGreen; i++) {
+      cardsColor.push('green');
+    }
+    while (cardsColor.length < totalCard) {
+      cardsColor.push('white');
+    }
+    return cardsColor;
   }
 
   setInitialPlayer() {
@@ -80,6 +90,13 @@ export class GameState {
     });
   }
 
+  countGreen() {
+    const revealedCards = this.cards.filter((card) => card.revealed);
+    revealedCards.forEach((revealedCard) => {
+      if (revealedCard.color == 'green') this.foundGreenCards++;
+    });
+  }
+
   shuffleArray(array: any[]) {
     const copy = [...array];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -93,6 +110,7 @@ export class GameState {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
     card.revealed = true;
+    this.revealed++;
     this.playerTurnId = card.ownerId;
   }
 
