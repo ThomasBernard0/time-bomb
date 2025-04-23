@@ -14,6 +14,7 @@ export type GameState = {
   playerId: string;
   playerTurnId: string;
   role: string;
+  winner: string;
   foundGreenCards: Card[];
   cards: Card[];
 };

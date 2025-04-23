@@ -142,6 +142,7 @@ export class GameState {
       playerId,
       playerTurnId: this.playerTurnId,
       role: this.players.find((player) => player.id == playerId).role,
+      winner: this.winner,
       foundGreenCards: this.foundGreenCards,
       cards: this.cards.map((card) => {
         if (card.revealed || card.ownerId === playerId) {
