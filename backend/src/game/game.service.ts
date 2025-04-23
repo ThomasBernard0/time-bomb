@@ -109,6 +109,10 @@ export class GameService {
     game.startGame();
   }
 
+  handleReveal(game: GameState, cardId: string) {
+    game.revealCard(cardId);
+  }
+
   getOrCreateGame(code: string): GameState {
     let game = this.games.get(code);
     if (!game) {

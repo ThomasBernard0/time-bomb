@@ -12,6 +12,7 @@ export type GameState = {
   status: string;
   players: Player[];
   playerId: string;
+  role: string;
   foundGreenCards: Card[];
   cards: Card[];
 };

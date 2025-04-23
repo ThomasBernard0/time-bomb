@@ -1,5 +1,7 @@
 export type CardColor = 'green' | 'red' | 'white';
 
+type Role = 'sherlock' | 'moriarty';
+
 export interface Card {
   id: string;
   color: CardColor;
@@ -10,6 +12,7 @@ export interface Card {
 export interface Player {
   id: string;
   name: string;
+  role: Role;
 }
 
 export class GameState {
@@ -34,6 +37,7 @@ export class GameState {
     this.round = 1;
     this.distributeCards();
     this.setInitialPlayer();
+    this.setRoles();
   }
 
   distributeCards() {
@@ -62,6 +66,20 @@ export class GameState {
     this.playerTurnId = this.shuffleArray(this.players)[0].id;
   }
 
+  setRoles() {
+    const totalPlayers = this.players.length;
+    const moriartyCount = 1;
+    const sherlockCount = totalPlayers - moriartyCount;
+    const roles: Role[] = [
+      ...Array(moriartyCount).fill('moriarty'),
+      ...Array(sherlockCount).fill('sherlock'),
+    ];
+    const shuffledRoles = this.shuffleArray(roles);
+    this.players.forEach((player, i) => {
+      player.role = shuffledRoles[i];
+    });
+  }
+
   shuffleArray(array: any[]) {
     const copy = [...array];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -84,6 +102,7 @@ export class GameState {
       status: this.status,
       players: this.players,
       playerId,
+      role: this.players.find((player) => player.id == playerId).role,
       foundGreenCards: this.foundGreenCards,
       cards: this.cards.map((card) => {
         if (card.revealed || card.ownerId === playerId) {
