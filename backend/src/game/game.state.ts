@@ -61,7 +61,7 @@ export class GameState {
 
   getCardsColor() {
     const numberOfPlayers = this.players.length;
-    const totalCard = numberOfPlayers * (numberOfPlayers + 2 - this.round);
+    const totalCard = numberOfPlayers * (6 - this.round);
     const cardsColor = ['red'];
     const remainingGreen = numberOfPlayers - this.foundGreenCards;
     for (let i = 0; i < remainingGreen; i++) {
