@@ -82,6 +82,23 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
           </Box>
         );
       })}
+      <Box
+        position="absolute"
+        bottom={16}
+        left={16}
+        width={80}
+        height={120}
+        bgcolor={gameState.role === "moriarty" ? "blue" : "red"}
+        borderRadius={2}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        boxShadow={3}
+      >
+        <Typography variant="subtitle2" color="white">
+          {gameState.role.toUpperCase()}
+        </Typography>
+      </Box>
     </Box>
   );
 };
