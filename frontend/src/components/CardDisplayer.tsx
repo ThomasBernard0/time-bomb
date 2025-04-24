@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { Card } from "../types";
 import socket from "../socket";
+import { motion } from "framer-motion";
 
 const CardDisplayer: React.FC<{
   card: Card;
@@ -10,17 +11,111 @@ const CardDisplayer: React.FC<{
   const handleClick = () => {
     socket.emit("reveal-card", { code, cardId: card.id });
   };
+
+  const getImage = () => {
+    if (card.color == "red") return "/images/card/bomb.png";
+    if (card.color == "green") return "/images/card/wire.png";
+    return "/images/card/empty.png";
+  };
   return (
     <Box
       width={60}
       height={90}
-      borderRadius={1}
-      bgcolor={
-        card.revealed || card.ownerId == playedId ? card.color : "grey.500"
-      }
-      border="1px solid black"
       onClick={handleClick}
-    />
+      sx={{ cursor: "pointer", perspective: "1000px" }}
+    >
+      {card.ownerId == playedId ? (
+        <motion.div
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: 8,
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+            transformStyle: "preserve-3d",
+          }}
+          animate={{ rotateY: card.revealed ? 180 : 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Box
+            component="img"
+            src={getImage()}
+            alt="front-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              zIndex: 2,
+            }}
+          />
+          <Box
+            component="img"
+            src={"/images/card/back.png"}
+            alt="back-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              transform: "rotateY(180deg)",
+            }}
+          />
+        </motion.div>
+      ) : (
+        <motion.div
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: 8,
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+            transformStyle: "preserve-3d",
+          }}
+          animate={{ rotateY: card.revealed ? 180 : 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Box
+            component="img"
+            src={"/images/card/back.png"}
+            alt="front-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              zIndex: 2,
+            }}
+          />
+          <Box
+            component="img"
+            src={getImage()}
+            alt="back-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              transform: "rotateY(180deg)",
+            }}
+          />
+        </motion.div>
+      )}
+    </Box>
   );
 };
 
