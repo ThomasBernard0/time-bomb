@@ -14,8 +14,8 @@ const RoleCard: React.FC<{
 
   const getImage = () => {
     return gameState.role === "moriarty"
-      ? "/images/role_moriarty.png"
-      : "/images/role_sherlock.png";
+      ? "/images/role/moriarty.png"
+      : "/images/role/sherlock.png";
   };
 
   return (
@@ -52,12 +52,12 @@ const RoleCard: React.FC<{
             position: "absolute",
             top: 0,
             left: 0,
-            zIndex: 2, // S'assure que l'avant de la carte est visible
+            zIndex: 2,
           }}
         />
         <Box
           component="img"
-          src="/images/role_back.png"
+          src="/images/role/back.png"
           alt="back-card"
           width="100%"
           height="100%"
