@@ -38,7 +38,9 @@ const CardDisplayer: React.FC<{
         >
           <Box
             component="img"
-            src={getImage()}
+            src={
+              card.ownerId == playedId ? getImage() : "/images/card/back.png"
+            }
             alt="front-card"
             width="100%"
             height="100%"
@@ -54,7 +56,9 @@ const CardDisplayer: React.FC<{
           />
           <Box
             component="img"
-            src={"/images/card/back.png"}
+            src={
+              card.ownerId == playedId ? "/images/card/back.png" : getImage()
+            }
             alt="back-card"
             width="100%"
             height="100%"
