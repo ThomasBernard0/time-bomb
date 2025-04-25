@@ -19,8 +19,8 @@ const CardDisplayer: React.FC<{
   };
   return (
     <Box
-      width={60}
-      height={90}
+      width={70}
+      height={105}
       onClick={handleClick}
       sx={{ cursor: "pointer", perspective: "1000px" }}
     >
