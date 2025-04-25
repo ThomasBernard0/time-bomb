@@ -1,8 +1,8 @@
-export type CardColor = "green" | "red" | "white";
+export type CardType = "wire" | "bomb" | "empty";
 
 export interface Card {
   id: string;
-  color: CardColor;
+  type: CardType;
   ownerId: string;
   revealed: boolean;
 }
@@ -15,7 +15,7 @@ export type GameState = {
   player: Player;
   playerTurnId: string;
   cards: Card[];
-  foundGreenCards: number;
+  foundWireCards: number;
 };
 
 export type Player = {

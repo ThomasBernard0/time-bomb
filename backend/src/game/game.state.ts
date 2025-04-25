@@ -1,10 +1,10 @@
-export type CardColor = 'green' | 'red' | 'white';
+export type CardType = 'wire' | 'bomb' | 'empty';
 
 type Role = 'sherlock' | 'moriarty';
 
 export interface Card {
   id: string;
-  color: CardColor;
+  type: CardType;
   ownerId: string;
   revealed: boolean;
 }
@@ -23,7 +23,7 @@ export type GameStateUI = {
   player: Player;
   playerTurnId: string;
   cards: Card[];
-  foundGreenCards: number;
+  foundWireCards: number;
 };
 
 export class GameState {
@@ -33,7 +33,7 @@ export class GameState {
   cards: Card[] = [];
   revealed: number;
   round: number;
-  foundGreenCards: number;
+  foundWireCards: number;
   status: string;
   winner: Role;
 
@@ -49,20 +49,20 @@ export class GameState {
     this.status = 'in-progress';
     this.round = 1;
     this.revealed = 0;
-    this.foundGreenCards = 0;
+    this.foundWireCards = 0;
     this.distributeCards();
     this.setInitialPlayer();
     this.setRoles();
   }
 
   distributeCards() {
-    const cardsColor = this.getCardsColor();
-    const shuffledCardsColor = this.shuffleArray(cardsColor);
+    const cardsType = this.getCardsType();
+    const shuffledCardsType = this.shuffleArray(cardsType);
     const newCards: Card[] = [];
-    for (let i = 0; i < cardsColor.length; i++) {
+    for (let i = 0; i < cardsType.length; i++) {
       newCards.push({
         id: i.toString(),
-        color: shuffledCardsColor[i],
+        type: shuffledCardsType[i],
         ownerId: this.players[i % this.players.length].id,
         revealed: false,
       });
@@ -70,18 +70,18 @@ export class GameState {
     this.cards = newCards;
   }
 
-  getCardsColor() {
+  getCardsType() {
     const numberOfPlayers = this.players.length;
     const totalCard = numberOfPlayers * (6 - this.round);
-    const cardsColor = ['red'];
-    const remainingGreen = numberOfPlayers - this.foundGreenCards;
-    for (let i = 0; i < remainingGreen; i++) {
-      cardsColor.push('green');
+    const cardsType = ['bomb'];
+    const remainingWire = numberOfPlayers - this.foundWireCards;
+    for (let i = 0; i < remainingWire; i++) {
+      cardsType.push('wire');
     }
-    while (cardsColor.length < totalCard) {
-      cardsColor.push('white');
+    while (cardsType.length < totalCard) {
+      cardsType.push('empty');
     }
-    return cardsColor;
+    return cardsType;
   }
 
   setInitialPlayer() {
@@ -116,8 +116,8 @@ export class GameState {
   revealCard(cardId: string) {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card) return;
-    if (card.color == 'green') this.foundGreenCards++;
-    if (card.color == 'red') {
+    if (card.type == 'wire') this.foundWireCards++;
+    if (card.type == 'bomb') {
       this.status = 'ended';
       this.winner = 'moriarty';
     }
@@ -127,7 +127,7 @@ export class GameState {
   }
 
   checkSherlockWin() {
-    if (this.foundGreenCards == this.players.length) {
+    if (this.foundWireCards == this.players.length) {
       this.status = 'ended';
       this.winner = 'sherlock';
     }
@@ -159,19 +159,19 @@ export class GameState {
       })),
       player: this.players.find((p) => p.id == playerId),
       playerTurnId: this.playerTurnId,
-      foundGreenCards: this.foundGreenCards,
+      foundWireCards: this.foundWireCards,
       cards: this.cards.map((card) => {
         if (card.revealed || card.ownerId === playerId) {
           return {
             id: card.id,
-            color: card.color,
+            type: card.type,
             ownerId: card.ownerId,
             revealed: card.revealed,
           };
         } else {
           return {
             id: card.id,
-            color: null,
+            type: null,
             ownerId: card.ownerId,
             revealed: false,
           };

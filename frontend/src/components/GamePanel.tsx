@@ -98,7 +98,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         );
       })}
       <RoleCard gameState={gameState} />
-      <WireCounter count={gameState.foundGreenCards} />
+      <WireCounter count={gameState.foundWireCards} />
     </Box>
   );
 };

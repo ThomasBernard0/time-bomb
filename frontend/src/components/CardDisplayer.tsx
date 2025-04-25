@@ -13,8 +13,8 @@ const CardDisplayer: React.FC<{
   };
 
   const getImage = () => {
-    if (card.color == "red") return "/images/card/bomb.png";
-    if (card.color == "green") return "/images/card/wire.png";
+    if (card.type == "bomb") return "/images/card/bomb.png";
+    if (card.type == "wire") return "/images/card/wire.png";
     return "/images/card/empty.png";
   };
   return (
