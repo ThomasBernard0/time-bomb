@@ -20,14 +20,13 @@ const NameDisplayer: React.FC<{
           gap: "10px",
           bgcolor: "lightgrey",
           m: "16px",
-          padding: "8px",
+          paddingY: "8px",
+          paddingX: "32px",
           border: "solid 1px black",
           borderRadius: "8px",
         }}
       >
-        <Typography align="center" variant="subtitle2" mb={1}>
-          {name}
-        </Typography>
+        <Typography variant="subtitle2">{name}</Typography>
         {isTurn && (
           <Box
             component="img"

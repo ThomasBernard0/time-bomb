@@ -58,7 +58,10 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             />
           ))}
         </Box>
-        <NameDisplayer name={"player"} isTurn={true} />
+        <NameDisplayer
+          name={gameState.player.name}
+          isTurn={gameState.player.id == gameState.playerTurnId}
+        />
       </Box>
 
       {Object.entries(otherPlayersCards).map(([ownerId, cards], idx) => {
