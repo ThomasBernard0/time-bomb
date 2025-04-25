@@ -13,7 +13,7 @@ const RoleCard: React.FC<{
   };
 
   const getImage = () => {
-    return gameState.role === "moriarty"
+    return gameState.player.role === "moriarty"
       ? "/images/role/moriarty.png"
       : "/images/role/sherlock.png";
   };

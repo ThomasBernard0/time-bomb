@@ -7,13 +7,13 @@ import NameDisplayer from "./NameDisplayer";
 const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const getPlayerCards = () => {
     return gameState?.cards.filter(
-      (card) => card.ownerId == gameState.playerId
+      (card) => card.ownerId == gameState.player.id
     );
   };
 
   const groupCardsByUser = (): Record<string, Card[]> | undefined => {
     return gameState?.cards.reduce((acc, card) => {
-      if (card.ownerId === gameState?.playerId) return acc;
+      if (card.ownerId === gameState?.player.id) return acc;
 
       if (!acc[card.ownerId]) {
         acc[card.ownerId] = [];
@@ -53,7 +53,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             <CardDisplayer
               key={c.id}
               card={c}
-              playedId={gameState.playerId}
+              playerId={gameState.player.id}
               code={gameState.code}
             />
           ))}
@@ -85,7 +85,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
                 <CardDisplayer
                   key={c.id}
                   card={c}
-                  playedId={gameState.playerId}
+                  playerId={gameState.player.id}
                   code={gameState.code}
                 />
               ))}

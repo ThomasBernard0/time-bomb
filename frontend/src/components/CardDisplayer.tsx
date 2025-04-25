@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 const CardDisplayer: React.FC<{
   card: Card;
-  playedId: string;
+  playerId: string;
   code: string;
-}> = ({ card, playedId, code }) => {
+}> = ({ card, playerId, code }) => {
   const handleClick = () => {
     socket.emit("reveal-card", { code, cardId: card.id });
   };
@@ -37,7 +37,7 @@ const CardDisplayer: React.FC<{
       >
         <Box
           component="img"
-          src={card.ownerId == playedId ? getImage() : "/images/card/back.png"}
+          src={card.ownerId == playerId ? getImage() : "/images/card/back.png"}
           alt="front-card"
           width="100%"
           height="100%"
@@ -53,7 +53,7 @@ const CardDisplayer: React.FC<{
         />
         <Box
           component="img"
-          src={card.ownerId == playedId ? "/images/card/back.png" : getImage()}
+          src={card.ownerId == playerId ? "/images/card/back.png" : getImage()}
           alt="back-card"
           width="100%"
           height="100%"

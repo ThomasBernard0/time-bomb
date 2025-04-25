@@ -15,6 +15,17 @@ export interface Player {
   role: Role;
 }
 
+export type GameStateUI = {
+  code: string;
+  status: string;
+  winner: string;
+  players: Player[];
+  player: Player;
+  playerTurnId: string;
+  cards: Card[];
+  foundGreenCards: number;
+};
+
 export class GameState {
   code: string;
   players: Player[] = [];
@@ -134,15 +145,18 @@ export class GameState {
     }
   }
 
-  getVisibleStateFor(playerId: string) {
+  getVisibleStateFor(playerId: string): GameStateUI {
     return {
       code: this.code,
       status: this.status,
-      players: this.players,
-      playerId,
-      playerTurnId: this.playerTurnId,
-      role: this.players.find((player) => player.id == playerId).role,
       winner: this.winner,
+      players: this.players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        role: null,
+      })),
+      player: this.players.find((p) => p.id == playerId),
+      playerTurnId: this.playerTurnId,
       foundGreenCards: this.foundGreenCards,
       cards: this.cards.map((card) => {
         if (card.revealed || card.ownerId === playerId) {
