@@ -21,10 +21,10 @@ const RoleCard: React.FC<{
   return (
     <Box
       position="absolute"
-      bottom={16}
+      bottom={0}
       left={16}
-      width={80}
-      height={120}
+      width={100}
+      height={150}
       onClick={handleFlip}
       sx={{ cursor: "pointer", perspective: "1000px" }}
     >

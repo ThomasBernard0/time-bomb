@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Card, GameState } from "../types";
 import CardDisplayer from "./CardDisplayer";
 import RoleCard from "./RoleDisplayer";
+import NameDisplayer from "./NameDisplayer";
 
 const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const getPlayerCards = () => {
@@ -38,23 +39,26 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const angles = Array.from({ length: n }, (_, i) => startAngle - i * step);
 
   return (
-    <Box position="relative" width="100%" height="90vh">
+    <Box position="relative" width="100%" height="94vh" overflow="hidden">
       <Box
         position="absolute"
-        bottom={16}
-        left="50%"
-        display="flex"
-        gap={1}
-        sx={{ transform: "translateX(-50%)" }}
+        sx={{
+          left: "50%",
+          top: "80%",
+          transform: `translateX(-50%)`,
+        }}
       >
-        {playerCards.map((c) => (
-          <CardDisplayer
-            key={c.id}
-            card={c}
-            playedId={gameState.playerId}
-            code={gameState.code}
-          />
-        ))}
+        <Box display="flex" gap={1}>
+          {playerCards.map((c) => (
+            <CardDisplayer
+              key={c.id}
+              card={c}
+              playedId={gameState.playerId}
+              code={gameState.code}
+            />
+          ))}
+        </Box>
+        <NameDisplayer name={"player"} isTurn={true} />
       </Box>
 
       {Object.entries(otherPlayersCards).map(([ownerId, cards], idx) => {
@@ -72,12 +76,10 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
               transform: `translate(-50%, 100%)`,
             }}
           >
-            <Typography align="center" variant="subtitle2" mb={1}>
-              {player.name}
-            </Typography>
-            {gameState.playerTurnId == player.id && (
-              <Typography>TOI</Typography>
-            )}
+            <NameDisplayer
+              name={player.name}
+              isTurn={player.id == gameState.playerTurnId}
+            />
             <Box display="flex" gap={1}>
               {cards.map((c) => (
                 <CardDisplayer

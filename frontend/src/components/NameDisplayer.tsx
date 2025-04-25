@@ -1,0 +1,46 @@
+import { Box, Typography } from "@mui/material";
+
+const NameDisplayer: React.FC<{
+  name: string;
+  isTurn: boolean;
+}> = ({ name, isTurn }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "10px",
+          bgcolor: "lightgrey",
+          m: "16px",
+          padding: "8px",
+          border: "solid 1px black",
+          borderRadius: "8px",
+        }}
+      >
+        <Typography align="center" variant="subtitle2" mb={1}>
+          {name}
+        </Typography>
+        {isTurn && (
+          <Box
+            component="img"
+            src={"/images/utils/cutting_pliers.png"}
+            alt="cutting_pliers"
+            width="30px"
+            height="45px"
+            borderRadius={2}
+          />
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+export default NameDisplayer;
