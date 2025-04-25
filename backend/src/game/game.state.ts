@@ -90,8 +90,10 @@ export class GameState {
 
   setRoles() {
     const totalPlayers = this.players.length;
-    const moriartyCount = 1;
-    const sherlockCount = totalPlayers - moriartyCount;
+    const moriartyMap = { 4: 2, 5: 2, 6: 2, 7: 3, 8: 3 };
+    const sherlockMap = { 4: 3, 5: 3, 6: 4, 7: 5, 8: 5 };
+    const moriartyCount = moriartyMap[totalPlayers];
+    const sherlockCount = sherlockMap[totalPlayers];
     const roles: Role[] = [
       ...Array(moriartyCount).fill('moriarty'),
       ...Array(sherlockCount).fill('sherlock'),
