@@ -114,7 +114,8 @@ export class GameService {
     game.checkSherlockWin();
     return (
       game.revealed == game.players.length &&
-      game.players.length != game.foundGreenCards
+      game.players.length != game.foundGreenCards &&
+      game.status != 'ended'
     );
   }
 
