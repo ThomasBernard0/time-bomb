@@ -3,6 +3,7 @@ import { Card, GameState } from "../types";
 import CardDisplayer from "./CardDisplayer";
 import RoleCard from "./RoleDisplayer";
 import NameDisplayer from "./NameDisplayer";
+import WireCounter from "./WireCounter";
 
 const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const getPlayerCards = () => {
@@ -97,6 +98,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         );
       })}
       <RoleCard gameState={gameState} />
+      <WireCounter count={gameState.foundGreenCards} />
     </Box>
   );
 };
