@@ -6,7 +6,6 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameState, Player } from './game.state';
 import { GameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
 
@@ -25,93 +24,88 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private authService: AuthService,
   ) {}
 
-  private gamesSockets: Map<string, socketsValues[]> = new Map();
+  private biMap: BiMapUserSocket = new BiMapUserSocket();
 
-  handleConnection(socket: Socket) {
+  handleConnection(socket: Socket): void {
     console.log(`Client connected: ${socket.id}`);
   }
 
-  handleDisconnect(socket: Socket) {
+  handleDisconnect(socket: Socket): void {
     console.log(`Client disconnected: ${socket.id}`);
   }
 
   @SubscribeMessage('join-game')
-  async handleJoin(socket: Socket, data: { token: string; code: string }) {
-    const { token, code } = data;
+  async handleJoin(
+    socket: Socket,
+    data: { token: string; code: string; name: string },
+  ): Promise<void> {
+    const { token, code, name } = data;
     const user = await this.authService.validateToken(token);
     if (!user) {
       return;
     }
+    const userId = user.id;
 
-    let player = await this.gameService.getPlayerByUserIdAndCode(code, user.id);
-    let game = this.gameService.getOrCreateGame(code);
-    const playerInState: Player = game.players.find((p) => p.id === player.id);
-    if (playerInState) {
-      if (playerInState.name !== player.name) {
-        playerInState.name = player.name;
+    this.gameService.createGame(code);
+    if (this.biMap.hasUser(userId)) {
+      this.biMap.setSocketFromUser(userId, socket.id);
+      if (this.biMap.hasGameFromUser(userId, code)) {
+        this.gameService.setOnline(code, userId);
+      } else {
+        this.biMap.addGameFromUser(userId, code);
+        this.gameService.addPlayer(code, userId, name);
       }
     } else {
-      game.addPlayer({ id: player.id, name: player.name, role: null });
-    }
-
-    const existingSockets = this.gamesSockets.get(code) || [];
-    const existSocket = existingSockets.some((p) => p.socketId === socket.id);
-    if (!existSocket) {
-      this.gamesSockets.set(code, [
-        ...existingSockets,
-        {
-          socketId: socket.id,
-          playerId: player.id,
-        },
-      ]);
+      this.biMap.set(userId, socket.id, code);
+      this.gameService.addPlayer(code, userId, name);
     }
     socket.join(code);
 
-    this.emitGameState(game, code);
+    this.emitGameState(code);
   }
 
   @SubscribeMessage('start-game')
-  handleStartGame(socket: Socket, data: { code: string }) {
+  handleStartGame(socket: Socket, data: { code: string }): void {
     const { code } = data;
-    let game = this.gameService.getOrCreateGame(code);
-    if (!game) return;
 
     this.gameService.startGame(code);
 
-    this.emitGameState(game, code);
+    this.emitGameState(code);
   }
 
   @SubscribeMessage('reveal-card')
-  handleReveal(socket: Socket, data: { code: string; cardId: string }) {
+  handleReveal(socket: Socket, data: { code: string; cardId: string }): void {
     const { code, cardId } = data;
-    let game = this.gameService.getOrCreateGame(code);
-    if (!game) return;
-    const playerId = this.gamesSockets
-      .get(code)
-      .find((p) => p.socketId === socket.id).playerId;
-    if (playerId != game.playerTurnId) return;
-    const card = game.cards.find((c) => c.id === cardId);
-    if (card.ownerId == playerId) return;
-    if (game.revealed == game.players.length) return;
+    const playerId = this.biMap.getFromSocket(socket.id);
+    if (
+      !this.gameService.isPlayerTurn(code, playerId) ||
+      !this.gameService.isOpponentCard(code, playerId, cardId) ||
+      this.gameService.isEndOfRound(code)
+    )
+      return;
 
-    const isEndOfRound = this.gameService.handleReveal(game, cardId);
+    const isEndOfRound = this.gameService.handleReveal(code, cardId);
 
-    this.emitGameState(game, code);
+    this.emitGameState(code);
 
     if (isEndOfRound) {
       setTimeout(() => {
-        this.gameService.handleEndOfRound(game);
-        this.emitGameState(game, code);
+        this.gameService.handleEndOfRound(code);
+        this.emitGameState(code);
       }, 2000);
     }
   }
 
-  private emitGameState(game: GameState, code: string) {
-    for (const { socketId, playerId } of this.gamesSockets.get(code)) {
-      const socket = this.server.sockets.sockets.get(socketId);
-      if (socket) {
-        socket.emit('game-updated', game.getVisibleStateFor(playerId));
-      }
-    }
+  async emitGameState(code: string): Promise<void> {
+    const sockets = await this.server.in(code).fetchSockets();
+    sockets.forEach((socket) => {
+      socket.emit(
+        'game-updated',
+        this.gameService.getVisibleStateFor(
+          code,
+          this.biMap.getFromSocket(socket.id),
+        ),
+      );
+    });
   }
 }

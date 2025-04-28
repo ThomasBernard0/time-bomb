@@ -1,10 +1,13 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { GameState } from './game.state';
+import {
+  Card,
+  CardType,
+  GameState,
+  GameStateUI,
+  Player,
+  Role,
+} from './game.state';
 
 @Injectable()
 export class GameService {
@@ -12,131 +15,214 @@ export class GameService {
 
   private games: Map<string, GameState> = new Map();
 
-  async createGame(userId: string, name: string) {
-    const code = Math.random().toString(36).substr(2, 6).toUpperCase();
-    const game = await this.prisma.game.create({
-      data: {
-        code,
-        host: {
-          connect: { id: userId },
-        },
-        status: 'WAITING',
-      },
-    });
-    await this.prisma.player.create({
-      data: {
-        userId,
-        name,
-        gameId: game.id,
-      },
-    });
-    return { code: game.code };
+  verifyGameCode(code: string): boolean {
+    return true;
   }
 
-  async verifyGameCode(code: string) {
-    const game = await this.prisma.game.findUnique({
-      where: { code: code },
-    });
-    return game;
-  }
-
-  async getPlayersInGame(code: string) {
-    const game = await this.prisma.game.findUnique({
-      where: { code },
-      include: {
-        players: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
+  createGame(code: string): void {
+    const game: GameState = this.games.get(code);
     if (!game) {
-      throw new NotFoundException('Partie introuvable.');
+      const newGame = new GameState(code);
+      this.games.set(code, newGame);
     }
-    return game.players;
-  }
-
-  async getPlayerByUserIdAndCode(code: string, userId: string) {
-    const player = await this.prisma.player.findFirst({
-      where: {
-        game: {
-          code: code,
-        },
-        userId: userId,
-      },
-    });
-    if (!player) {
-      throw new NotFoundException('Joueur introuvable.');
-    }
-    return player;
-  }
-
-  async joinGame(code: string, userId: string, name: string) {
-    const game = await this.prisma.game.findUnique({
-      where: { code },
-    });
-
-    if (!game) {
-      throw new NotFoundException('Partie introuvable.');
-    }
-
-    await this.prisma.player.upsert({
-      where: {
-        userId_gameId: {
-          userId: userId,
-          gameId: game.id,
-        },
-      },
-      update: {
-        name,
-      },
-      create: {
-        userId,
-        name,
-        gameId: game.id,
-      },
-    });
-
-    return { code: game.code };
-  }
-
-  startGame(code: string) {
-    const game = this.games.get(code);
-    if (!game) {
-      throw new Error('Game not found');
-    }
-    game.startGame();
-  }
-
-  handleReveal(game: GameState, cardId: string) {
-    game.revealCard(cardId);
-    game.checkSherlockWin();
-    return (
-      game.revealed == game.players.length &&
-      game.players.length != game.foundWireCards &&
-      game.status != 'ended'
-    );
-  }
-
-  handleEndOfRound(game: GameState) {
-    game.handleEndOfRound();
-  }
-
-  getOrCreateGame(code: string): GameState {
-    let game = this.games.get(code);
-    if (!game) {
-      game = new GameState(code);
-      this.games.set(code, game);
-    }
-    return game;
   }
 
   getGame(code: string): GameState | undefined {
     return this.games.get(code);
   }
 
-  removeGame(code: string) {
+  removeGame(code: string): void {
     this.games.delete(code);
+  }
+
+  addPlayer(code: string, userId: string, name: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    const player: Player = { id: userId, name: name, online: true, role: null };
+    game.players.push(player);
+  }
+
+  setOnline(code: string, userId: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    const player: Player = game.players.find((p) => p.id == userId);
+    if (player) player.online = true;
+  }
+
+  setOffline(code: string, userId: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    const player: Player = game.players.find((p) => p.id == userId);
+    if (player) player.online = false;
+  }
+
+  startGame(code: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    game.status = 'in-progress';
+    game.round = 1;
+    game.revealed = 0;
+    game.foundWireCards = 0;
+    this.distributeCards(game);
+    this.setInitialPlayer(game);
+    this.setRoles(game);
+  }
+
+  distributeCards(game: GameState): void {
+    const cardsType: CardType[] = this.getCardsType(game);
+    const shuffledCardsType: CardType[] = this.shuffleArray(cardsType);
+    const newCards: Card[] = [];
+    for (let i = 0; i < cardsType.length; i++) {
+      newCards.push({
+        id: i.toString(),
+        type: shuffledCardsType[i],
+        ownerId: game.players[i % game.players.length].id,
+        revealed: false,
+      });
+    }
+    game.cards = newCards;
+  }
+
+  getCardsType(game: GameState): CardType[] {
+    const numberOfPlayers: number = game.players.length;
+    const totalCard: number = numberOfPlayers * (6 - game.round);
+    const cardsType: CardType[] = ['bomb'];
+    const remainingWire: number = numberOfPlayers - game.foundWireCards;
+    for (let i = 0; i < remainingWire; i++) {
+      cardsType.push('wire');
+    }
+    while (cardsType.length < totalCard) {
+      cardsType.push('empty');
+    }
+    return cardsType;
+  }
+
+  setInitialPlayer(game: GameState): void {
+    game.playerTurnId = this.shuffleArray(game.players)[0].id;
+  }
+
+  setRoles(game: GameState): void {
+    const totalPlayers: number = game.players.length;
+    const moriartyMap: { [key: number]: number } = {
+      4: 2,
+      5: 2,
+      6: 2,
+      7: 3,
+      8: 3,
+    };
+    const sherlockMap: { [key: number]: number } = {
+      4: 3,
+      5: 3,
+      6: 4,
+      7: 5,
+      8: 5,
+    };
+    const moriartyCount: number = moriartyMap[totalPlayers];
+    const sherlockCount: number = sherlockMap[totalPlayers];
+    const roles: Role[] = [
+      ...Array(moriartyCount).fill('moriarty'),
+      ...Array(sherlockCount).fill('sherlock'),
+    ];
+    const shuffledRoles: Role[] = this.shuffleArray(roles);
+    game.players.forEach((player, i) => {
+      player.role = shuffledRoles[i];
+    });
+  }
+
+  shuffleArray(array: any[]): any[] {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  isPlayerTurn(code: string, playerId: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    return playerId == game.playerTurnId;
+  }
+
+  isOpponentCard(code: string, playerId: string, cardId: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    const card: Card = game.cards.find((c) => c.id === cardId);
+    if (!card) return false;
+    return card.ownerId != playerId;
+  }
+
+  isEndOfRound(code: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return true;
+    return game.revealed == game.players.length && game.status != 'ended';
+  }
+
+  handleReveal(code: string, cardId: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    const card: Card = game.cards.find((c) => c.id === cardId);
+    if (!card) return false;
+    if (card.type == 'wire') game.foundWireCards++;
+    if (game.foundWireCards == game.players.length) {
+      game.status = 'ended';
+      game.winner = 'sherlock';
+    }
+    if (card.type == 'bomb') {
+      game.status = 'ended';
+      game.winner = 'moriarty';
+    }
+    card.revealed = true;
+    game.revealed++;
+    game.playerTurnId = card.ownerId;
+    return this.isEndOfRound(code);
+  }
+
+  handleEndOfRound(code: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    game.revealed = 0;
+    game.round++;
+    if (game.round === 5) {
+      game.status = 'ended';
+      game.winner = 'moriarty';
+    }
+    this.distributeCards(game);
+  }
+
+  getVisibleStateFor(code: string, userId: string): GameStateUI {
+    const game: GameState = this.getGame(code);
+    if (!game) return null;
+    return {
+      code: game.code,
+      status: game.status,
+      winner: game.winner,
+      players: game.players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        online: p.online,
+        role: null,
+      })),
+      player: game.players.find((p) => p.id == userId),
+      playerTurnId: game.playerTurnId,
+      foundWireCards: game.foundWireCards,
+      cards: game.cards.map((card) => {
+        if (card.revealed || card.ownerId === userId) {
+          return {
+            id: card.id,
+            type: card.type,
+            ownerId: card.ownerId,
+            revealed: card.revealed,
+          };
+        } else {
+          return {
+            id: card.id,
+            type: null,
+            ownerId: card.ownerId,
+            revealed: false,
+          };
+        }
+      }),
+    };
   }
 }
