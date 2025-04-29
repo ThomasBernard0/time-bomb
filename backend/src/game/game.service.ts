@@ -16,7 +16,7 @@ export class GameService {
   private games: Map<string, GameState> = new Map();
 
   verifyGameCode(code: string): boolean {
-    return true;
+    return this.games.has(code);
   }
 
   createGame(code: string): void {

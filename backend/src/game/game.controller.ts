@@ -8,7 +8,6 @@ export class GameController {
 
   @Get(':code/verify')
   verifyGameCode(@Param('code') code: string) {
-    const res = this.gameService.verifyGameCode(code);
-    return res;
+    return this.gameService.verifyGameCode(code);
   }
 }
