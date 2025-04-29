@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createGame, joinGameByCode, verifyGameCode } from "../api/games";
+import { verifyGameCode } from "../api/games";
 import { Button, TextField, Stack, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
@@ -14,8 +14,9 @@ const Hub: React.FC = () => {
   const handleCreateGame = async () => {
     if (!token) return;
     try {
-      const game = await createGame(username, token);
-      navigate(`/lobby/${game.code}`);
+      const code = await getGameCode();
+      localStorage.setItem("username", username);
+      navigate(`/lobby/${code}`);
     } catch (err) {
       setError("Erreur lors de la création de la partie.");
     }
@@ -26,7 +27,7 @@ const Hub: React.FC = () => {
     try {
       const exists = await verifyGameCode(code, token);
       if (exists) {
-        await joinGameByCode(code, username, token);
+        localStorage.setItem("username", username);
         navigate(`/lobby/${code}`);
       } else {
         setError("Code de partie invalide.");
@@ -75,3 +76,6 @@ const Hub: React.FC = () => {
 };
 
 export default Hub;
+function getGameCode() {
+  throw new Error("Function not implemented.");
+}

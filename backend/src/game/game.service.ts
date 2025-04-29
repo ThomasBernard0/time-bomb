@@ -15,6 +15,15 @@ export class GameService {
 
   private games: Map<string, GameState> = new Map();
 
+  getGameCode() {
+    let code: string = null;
+    while (!code) {
+      const newCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+      if (!this.games.has(newCode)) code = newCode;
+    }
+    return code;
+  }
+
   verifyGameCode(code: string): boolean {
     return this.games.has(code);
   }

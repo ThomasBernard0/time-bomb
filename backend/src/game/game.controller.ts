@@ -6,7 +6,12 @@ import { GameService } from './game.service';
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
-  @Get(':code/verify')
+  @Get('code')
+  getGameCode() {
+    return this.gameService.getGameCode();
+  }
+
+  @Get('verify/:code')
   verifyGameCode(@Param('code') code: string) {
     return this.gameService.verifyGameCode(code);
   }
