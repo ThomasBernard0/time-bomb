@@ -1,4 +1,7 @@
-class BiMapUserSocket {
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class BiMapUserSocket {
   private userMap = new Map<string, { socketId: string; games: string[] }>();
   private socketMap = new Map<string, string>();
 

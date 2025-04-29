@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
+import { BiMapUserSocket } from 'src/utils/BiMapUserSocket';
 
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -17,9 +18,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private gameService: GameService,
     private authService: AuthService,
+    private biMap: BiMapUserSocket,
   ) {}
-
-  private biMap: BiMapUserSocket = new BiMapUserSocket();
 
   handleConnection(socket: Socket): void {}
 
