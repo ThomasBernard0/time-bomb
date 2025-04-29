@@ -6,19 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "http://localhost:3000";
 
-export const createGame = async (
-  username: string,
-  token: string
-): Promise<{ code: string }> => {
-  const res = await axios.post(
-    `${BASE_URL}/games/code`,
-    { name: username },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export const getGameCode = async (token: string): Promise<{ code: string }> => {
+  const res = await axios.get(`${BASE_URL}/games/code`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 };
 

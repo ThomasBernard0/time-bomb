@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { verifyGameCode } from "../api/games";
+import { getGameCode, verifyGameCode } from "../api/games";
 import { Button, TextField, Stack, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
@@ -14,7 +14,7 @@ const Hub: React.FC = () => {
   const handleCreateGame = async () => {
     if (!token) return;
     try {
-      const code = await getGameCode();
+      const code = await getGameCode(token);
       localStorage.setItem("username", username);
       navigate(`/lobby/${code}`);
     } catch (err) {
@@ -74,8 +74,4 @@ const Hub: React.FC = () => {
     </Stack>
   );
 };
-
 export default Hub;
-function getGameCode() {
-  throw new Error("Function not implemented.");
-}
