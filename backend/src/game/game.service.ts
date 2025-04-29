@@ -38,8 +38,21 @@ export class GameService {
   addPlayer(code: string, userId: string, name: string): void {
     const game: GameState = this.getGame(code);
     if (!game) return;
-    const player: Player = { id: userId, name: name, online: true, role: null };
+    const player: Player = {
+      id: userId,
+      name: name,
+      online: true,
+      host: game.players.length == 0 ? true : false,
+      role: null,
+    };
     game.players.push(player);
+  }
+
+  removePlayer(code: string, userId: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    const newPlayers = game.players.filter((p) => p.id != userId);
+    game.players = newPlayers;
   }
 
   setOnline(code: string, userId: string): void {
@@ -150,6 +163,14 @@ export class GameService {
     return copy;
   }
 
+  isPlayerHost(code: string, playerId: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    const player = game.players.find((p) => p.id == playerId);
+    if (!player) return false;
+    return player.host;
+  }
+
   isPlayerTurn(code: string, playerId: string): boolean {
     const game: GameState = this.getGame(code);
     if (!game) return false;
@@ -213,6 +234,7 @@ export class GameService {
         id: p.id,
         name: p.name,
         online: p.online,
+        host: p.host,
         role: null,
       })),
       player: game.players.find((p) => p.id == userId),

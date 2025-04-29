@@ -9,11 +9,6 @@ import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
 
-export interface socketsValues {
-  socketId: string;
-  playerId: string;
-}
-
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -78,9 +73,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.emitGameState(code);
   }
 
+  @SubscribeMessage('kick')
+  handleKick(socket: Socket, data: { code: string; kickUserId: string }): void {
+    const { code, kickUserId } = data;
+    const userId = this.biMap.getFromSocket(socket.id);
+    if (!this.gameService.isPlayerHost(code, userId)) return;
+
+    this.gameService.removePlayer(code, userId);
+    this.biMap.deleteGameFromUser(kickUserId, code);
+    const kickSocketId = this.biMap.getFromUser(kickUserId).socketId;
+    this.kick(kickSocketId, code);
+
+    this.emitGameState(code);
+  }
+
+  async kick(socketId: string, code: string): Promise<void> {
+    const socket = this.server.sockets.sockets.get(socketId);
+    if (socket) {
+      await socket.leave(code);
+      socket.emit('kicked');
+    }
+  }
+
   @SubscribeMessage('start-game')
   handleStartGame(socket: Socket, data: { code: string }): void {
     const { code } = data;
+    const userId = this.biMap.getFromSocket(socket.id);
+    if (!this.gameService.isPlayerHost(code, userId)) return;
 
     this.gameService.startGame(code);
 
@@ -90,10 +109,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('reveal-card')
   handleReveal(socket: Socket, data: { code: string; cardId: string }): void {
     const { code, cardId } = data;
-    const playerId = this.biMap.getFromSocket(socket.id);
+    const userId = this.biMap.getFromSocket(socket.id);
     if (
-      !this.gameService.isPlayerTurn(code, playerId) ||
-      !this.gameService.isOpponentCard(code, playerId, cardId) ||
+      !this.gameService.isPlayerTurn(code, userId) ||
+      !this.gameService.isOpponentCard(code, userId, cardId) ||
       this.gameService.isEndOfRound(code)
     )
       return;
@@ -107,14 +126,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameService.handleEndOfRound(code);
         this.emitGameState(code);
       }, 2000);
-    }
-  }
-
-  async kick(socketId: string, code: string): Promise<void> {
-    const socket = this.server.sockets.sockets.get(socketId);
-    if (socket) {
-      await socket.leave(code);
-      socket.emit('kicked');
     }
   }
 

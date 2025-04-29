@@ -13,6 +13,7 @@ export type Player = {
   id: string;
   name: string;
   online: boolean;
+  host: boolean;
   role: Role;
 };
 
