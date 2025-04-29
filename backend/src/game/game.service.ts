@@ -56,6 +56,18 @@ export class GameService {
     if (player) player.online = false;
   }
 
+  isAllOffline(code: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    return game.players.filter((p) => p.online == true).length != 0;
+  }
+
+  getUsersId(code: string): string[] {
+    const game: GameState = this.getGame(code);
+    if (!game) return [];
+    return game.players.map((p) => p.id);
+  }
+
   startGame(code: string): void {
     const game: GameState = this.getGame(code);
     if (!game) return;
