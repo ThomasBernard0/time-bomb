@@ -28,13 +28,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const games = this.biMap.getGameFromUser(userId);
     for (const code in games) {
       this.gameService.setOffline(code, userId);
-      if (this.gameService.isAllOffline(code)) {
-        const usersId = this.gameService.getUsersId(code);
-        this.gameService.removeGame(code);
-        for (const id in usersId) {
-          this.biMap.deleteGameFromUser(code, id);
-        }
-      }
+      this.handleDeleteGame(code);
     }
   }
 
@@ -53,11 +47,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.createGame(code);
     if (this.biMap.hasUser(userId)) {
       const oldSocketId = this.biMap.getFromUser(userId).socketId;
-      const games = this.biMap.getGameFromUser(userId);
-      for (const game in games) {
-        this.kick(oldSocketId, game);
+      if (oldSocketId != socket.id) {
+        const games = this.biMap.getGameFromUser(userId);
+        for (const game in games) {
+          this.kick(oldSocketId, game);
+        }
+        this.biMap.setSocketFromUser(userId, socket.id);
       }
-      this.biMap.setSocketFromUser(userId, socket.id);
       if (this.biMap.hasGameFromUser(userId, code)) {
         this.gameService.setOnline(code, userId);
       } else {
@@ -69,7 +65,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.addPlayer(code, userId, name);
     }
     socket.join(code);
-
     this.emitGameState(code);
   }
 
@@ -77,12 +72,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleKick(socket: Socket, data: { code: string; kickUserId: string }): void {
     const { code, kickUserId } = data;
     const userId = this.biMap.getFromSocket(socket.id);
-    if (!this.gameService.isPlayerHost(code, userId)) return;
+    const kickId = kickUserId ? kickUserId : userId;
+    if (!this.gameService.isPlayerHost(code, userId) && kickUserId) return;
 
     this.gameService.removePlayer(code, userId);
-    this.biMap.deleteGameFromUser(kickUserId, code);
-    const kickSocketId = this.biMap.getFromUser(kickUserId).socketId;
-    this.kick(kickSocketId, code);
+
+    const kickSocketValue = this.biMap.getFromUser(kickId);
+    if (kickSocketValue) {
+      this.kick(kickSocketValue.socketId, code);
+      this.biMap.deleteGameFromUser(kickId, code);
+      this.handleDeleteGame(code);
+    }
 
     this.emitGameState(code);
   }
@@ -92,6 +92,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (socket) {
       await socket.leave(code);
       socket.emit('kicked');
+    }
+  }
+
+  handleDeleteGame(code) {
+    if (this.gameService.isAllOffline(code)) {
+      const usersId = this.gameService.getUsersId(code);
+      this.gameService.removeGame(code);
+      for (const id in usersId) {
+        this.biMap.deleteGameFromUser(id, code);
+      }
     }
   }
 
@@ -118,7 +128,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
 
     const isEndOfRound = this.gameService.handleReveal(code, cardId);
-
     this.emitGameState(code);
 
     if (isEndOfRound) {
@@ -130,6 +139,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async emitGameState(code: string): Promise<void> {
+    console.log('EMIT');
+    console.log(this.biMap);
     const sockets = await this.server.in(code).fetchSockets();
     sockets.forEach((socket) => {
       socket.emit(

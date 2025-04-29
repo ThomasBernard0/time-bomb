@@ -40,6 +40,8 @@ export class BiMapUserSocket {
   }
 
   deleteGameFromUser(userId: string, game: string): void {
+    const socketValue = this.userMap.get(userId);
+    if (!socketValue) return;
     const newGames = this.userMap.get(userId).games.filter((g) => g != game);
     const socketId = this.userMap.get(userId).socketId;
     if (newGames.length == 0) {
@@ -51,11 +53,15 @@ export class BiMapUserSocket {
   }
 
   hasGameFromUser(userId: string, game: string): boolean {
-    return this.userMap.get(userId).games.includes(game);
+    const socketValue = this.userMap.get(userId);
+    if (socketValue) return socketValue.games.includes(game);
+    return false;
   }
 
   getGameFromUser(userId: string): string[] {
-    return this.userMap.get(userId).games;
+    const socketValue = this.userMap.get(userId);
+    if (socketValue) return socketValue.games;
+    return [];
   }
 
   clear() {

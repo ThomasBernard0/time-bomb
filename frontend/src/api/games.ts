@@ -43,10 +43,11 @@ export const useGameStateSocket = (code: string, token: string) => {
     const username = localStorage.getItem("username");
     socket.emit("join-game", { code, token, name: username });
     return () => {
+      socket.emit("kick", { code, kickUserId: null });
       socket.off("game-updated");
       socket.off("kicked");
     };
-  }, [code, token]);
+  }, []);
 
   return { gameState };
 };

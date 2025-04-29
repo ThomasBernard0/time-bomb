@@ -81,7 +81,7 @@ export class GameService {
   isAllOffline(code: string): boolean {
     const game: GameState = this.getGame(code);
     if (!game) return false;
-    return game.players.filter((p) => p.online == true).length != 0;
+    return game.players.filter((p) => p.online == true).length == 0;
   }
 
   getUsersId(code: string): string[] {
