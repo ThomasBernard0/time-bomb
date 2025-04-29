@@ -9,9 +9,9 @@ import {
   Link,
   Paper,
 } from "@mui/material";
-import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { postLogin, postRegister } from "../api/auth";
 
 export default function AuthPage() {
   const { login } = useAuth();
@@ -26,8 +26,9 @@ export default function AuthPage() {
     setError("");
 
     try {
-      const endpoint = isRegister ? "/auth/register" : "/auth/login";
-      const res = await api.post(endpoint, { email, password });
+      const res = isRegister
+        ? await postRegister(email, password)
+        : await postLogin(email, password);
       const token = res.data.access_token;
       login(token);
       navigate("/hub");
