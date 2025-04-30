@@ -29,6 +29,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const code of games) {
       this.gameService.setOffline(code, userId);
       this.handleDeleteGame(code);
+
+      this.emitGameState(code);
     }
   }
 
@@ -65,6 +67,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.addPlayer(code, userId, name);
     }
     socket.join(code);
+
     this.emitGameState(code);
   }
 
