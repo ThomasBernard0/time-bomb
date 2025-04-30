@@ -21,6 +21,8 @@ export type GameState = {
 export type Player = {
   id: string;
   name: string;
+  online: boolean;
+  host: boolean;
   role: string;
 };
 

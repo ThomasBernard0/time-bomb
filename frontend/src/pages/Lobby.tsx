@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import socket from "../socket";
 import GamePanel from "../components/GamePanel";
 import EndModale from "../components/EndModale";
+import PlayerDisplayer from "../components/PlayerDisplayer";
 
 const Lobby: React.FC = () => {
   const { token } = useAuth();
@@ -42,7 +43,7 @@ const Lobby: React.FC = () => {
 
             <Stack spacing={1}>
               {gameState.players.map((player) => (
-                <Typography key={player.id}>{player.name}</Typography>
+                <PlayerDisplayer player={player} />
               ))}
               <Button
                 variant="contained"
