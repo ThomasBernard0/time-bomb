@@ -24,7 +24,6 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     try {
       const res = isRegister
         ? await postRegister(email, password)
@@ -35,6 +34,11 @@ export default function AuthPage() {
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion");
     }
+  };
+
+  const handleChangeForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsRegister(!isRegister);
   };
 
   return (
@@ -83,11 +87,8 @@ export default function AuthPage() {
 
           <Box mt={2} textAlign="center">
             <Typography variant="body2">
-              {isRegister ? "Déjà un compte ?" : "Pas encore de compte ?"}
-              <Link
-                component="button"
-                onClick={() => setIsRegister(!isRegister)}
-              >
+              {isRegister ? "Déjà un compte ? " : "Pas encore de compte ? "}
+              <Link component="button" onClick={handleChangeForm}>
                 {isRegister ? "Se connecter" : "S'inscrire"}
               </Link>
             </Typography>
