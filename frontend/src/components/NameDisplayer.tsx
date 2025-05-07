@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material";
+import { Player } from "../types";
 
 const NameDisplayer: React.FC<{
-  name: string;
+  player: Player;
   isTurn: boolean;
-}> = ({ name, isTurn }) => {
+}> = ({ player, isTurn }) => {
   return (
     <Box
       sx={{
@@ -26,7 +27,9 @@ const NameDisplayer: React.FC<{
           borderRadius: "8px",
         }}
       >
-        <Typography variant="subtitle2">{name}</Typography>
+        <Typography color={player.online ? "text.primary" : "text.disabled"}>
+          {player.name}
+        </Typography>
         {isTurn && (
           <Box
             component="img"

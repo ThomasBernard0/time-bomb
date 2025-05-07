@@ -60,7 +60,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
           ))}
         </Box>
         <NameDisplayer
-          name={gameState.player.name}
+          player={gameState.player}
           isTurn={gameState.player.id == gameState.playerTurnId}
         />
       </Box>
@@ -81,7 +81,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             }}
           >
             <NameDisplayer
-              name={player.name}
+              player={player}
               isTurn={player.id == gameState.playerTurnId}
             />
             <Box display="flex" gap={1}>
