@@ -71,19 +71,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.emitGameState(code);
   }
 
+  @SubscribeMessage('leave-game')
+  handleLeave(socket: Socket, data: { code: string }): void {
+    const { code } = data;
+    const userId = this.biMap.getFromSocket(socket.id);
+    if (!userId) return;
+
+    this.gameService.removePlayer(code, userId);
+    this.biMap.deleteGameFromUser(userId, code);
+    this.handleDeleteGame(code);
+
+    this.emitGameState(code);
+  }
+
   @SubscribeMessage('kick')
   handleKick(socket: Socket, data: { code: string; kickUserId: string }): void {
     const { code, kickUserId } = data;
     const userId = this.biMap.getFromSocket(socket.id);
-    const kickId = kickUserId ? kickUserId : userId;
-    if (!this.gameService.isPlayerHost(code, userId) && kickUserId) return;
+    if (!this.gameService.isPlayerHost(code, userId)) return;
 
-    this.gameService.removePlayer(code, userId);
+    this.gameService.removePlayer(code, kickUserId);
 
-    const kickSocketValue = this.biMap.getFromUser(kickId);
+    const kickSocketValue = this.biMap.getFromUser(kickUserId);
     if (kickSocketValue) {
       this.kick(kickSocketValue.socketId, code);
-      this.biMap.deleteGameFromUser(kickId, code);
+      this.biMap.deleteGameFromUser(kickUserId, code);
       this.handleDeleteGame(code);
     }
 
@@ -142,7 +154,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async emitGameState(code: string): Promise<void> {
-    console.log(this.biMap);
     const sockets = await this.server.in(code).fetchSockets();
     sockets.forEach((socket) => {
       socket.emit(

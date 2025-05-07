@@ -14,6 +14,14 @@ const Lobby: React.FC = () => {
   if (!code || !token) return null;
   const { gameState } = useGameStateSocket(code, token);
 
+  const handleKick = (playerId: string) => {
+    socket.emit("kick", { code, kickUserId: playerId });
+  };
+
+  const handleStartGame = () => {
+    socket.emit("start-game", { code });
+  };
+
   const [showEndModal, setShowEndModal] = useState(false);
   useEffect(() => {
     if (gameState?.status === "ended") {
@@ -28,10 +36,6 @@ const Lobby: React.FC = () => {
     setShowEndModal(false);
   };
 
-  const startGame = () => {
-    socket.emit("start-game", { code });
-  };
-
   if (!gameState) return;
 
   return (
@@ -43,11 +47,16 @@ const Lobby: React.FC = () => {
 
             <Stack spacing={1}>
               {gameState.players.map((player) => (
-                <PlayerDisplayer player={player} />
+                <PlayerDisplayer
+                  key={player.id}
+                  player={player}
+                  currentPlayer={gameState.player}
+                  onKick={handleKick}
+                />
               ))}
               <Button
                 variant="contained"
-                onClick={startGame}
+                onClick={handleStartGame}
                 disabled={gameState.players.length < 2}
               >
                 Commencer la partie
