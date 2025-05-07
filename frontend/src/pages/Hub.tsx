@@ -6,7 +6,9 @@ import { useAuth } from "../context/AuthContext";
 
 const Hub: React.FC = () => {
   const { token } = useAuth();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(
+    () => localStorage.getItem("username") || ""
+  );
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
