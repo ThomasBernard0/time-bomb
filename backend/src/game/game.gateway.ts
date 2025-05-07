@@ -58,6 +58,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       if (this.biMap.hasGameFromUser(userId, code)) {
         this.gameService.setOnline(code, userId);
+        this.gameService.setName(code, userId, name);
       } else {
         this.biMap.addGameFromUser(userId, code);
         this.gameService.addPlayer(code, userId, name);

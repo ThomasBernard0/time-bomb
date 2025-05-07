@@ -78,6 +78,13 @@ export class GameService {
     if (player) player.online = false;
   }
 
+  setName(code: string, userId: string, name: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    const player: Player = game.players.find((p) => p.id == userId);
+    if (player) player.name = name;
+  }
+
   isAllOffline(code: string): boolean {
     const game: GameState = this.getGame(code);
     if (!game) return false;
