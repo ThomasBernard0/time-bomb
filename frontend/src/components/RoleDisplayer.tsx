@@ -41,8 +41,8 @@ const RoleCard: React.FC<{
       >
         <Box
           component="img"
-          src={getImage()}
-          alt="front-card"
+          src="/images/role/back.png"
+          alt="back-card"
           width="100%"
           height="100%"
           borderRadius={2}
@@ -57,8 +57,8 @@ const RoleCard: React.FC<{
         />
         <Box
           component="img"
-          src="/images/role/back.png"
-          alt="back-card"
+          src={getImage()}
+          alt="front-card"
           width="100%"
           height="100%"
           borderRadius={2}
