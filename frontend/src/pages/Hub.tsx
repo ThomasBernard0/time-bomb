@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getGameCode, verifyGameCode } from "../api/games";
+import { createGame, verifyGameCode } from "../api/games";
 import { Button, TextField, Stack, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
@@ -16,7 +16,7 @@ const Hub: React.FC = () => {
   const handleCreateGame = async () => {
     if (!token) return;
     try {
-      const code = await getGameCode(token);
+      const code = await createGame(token);
       localStorage.setItem("username", username);
       navigate(`/lobby/${code}`);
     } catch (err) {

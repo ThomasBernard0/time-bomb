@@ -15,25 +15,21 @@ export class GameService {
 
   private games: Map<string, GameState> = new Map();
 
-  getGameCode() {
+  createGame() {
     let code: string = null;
     while (!code) {
       const newCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-      if (!this.games.has(newCode)) code = newCode;
+      if (!this.games.has(newCode)) {
+        const newGame = new GameState(newCode);
+        this.games.set(newCode, newGame);
+        code = newCode;
+      }
     }
     return code;
   }
 
   verifyGameCode(code: string): boolean {
     return this.games.has(code);
-  }
-
-  createGame(code: string): void {
-    const game: GameState = this.games.get(code);
-    if (!game) {
-      const newGame = new GameState(code);
-      this.games.set(code, newGame);
-    }
   }
 
   getGame(code: string): GameState | undefined {

@@ -46,7 +46,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const userId = user.id;
 
-    this.gameService.createGame(code);
     if (this.biMap.hasUser(userId)) {
       const oldSocketId = this.biMap.getFromUser(userId).socketId;
       if (oldSocketId != socket.id) {

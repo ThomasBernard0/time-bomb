@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "http://localhost:3000";
 
-export const getGameCode = async (token: string): Promise<{ code: string }> => {
-  const res = await axios.get(`${BASE_URL}/games/code`, {
+export const createGame = async (token: string): Promise<{ code: string }> => {
+  const res = await axios.get(`${BASE_URL}/games`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
