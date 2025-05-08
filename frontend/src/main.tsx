@@ -6,6 +6,7 @@ import Auth from "./pages/Auth";
 import PrivateRoute from "./components/PrivateRoute";
 import Hub from "./pages/Hub";
 import Lobby from "./pages/Lobby";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
