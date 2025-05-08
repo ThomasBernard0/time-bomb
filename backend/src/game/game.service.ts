@@ -28,16 +28,19 @@ export class GameService {
     return code;
   }
 
-  verifyGameCode(code: string): boolean {
-    return this.games.has(code);
-  }
-
   getGame(code: string): GameState | undefined {
     return this.games.get(code);
   }
 
   removeGame(code: string): void {
     this.games.delete(code);
+  }
+
+  verifyGameCode(code: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    if (game.status === 'in-progress') return false;
+    return true;
   }
 
   addPlayer(code: string, userId: string, name: string): void {
