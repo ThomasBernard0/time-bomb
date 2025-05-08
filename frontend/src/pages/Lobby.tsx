@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Stack, Button } from "@mui/material";
+import {
+  Typography,
+  Stack,
+  Button,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import { useGameStateSocket } from "../api/games";
 import { useAuth } from "../context/AuthContext";
 import socket from "../socket";
 import GamePanel from "../components/GamePanel";
 import EndModale from "../components/EndModale";
 import PlayerDisplayer from "../components/PlayerDisplayer";
+import NoGameFound from "../components/NoGameFound";
 
 const Lobby: React.FC = () => {
   const { token } = useAuth();
   const { code } = useParams<{ code: string }>();
   if (!code || !token) return null;
-  const { gameState } = useGameStateSocket(code, token);
+  const { gameState, loading } = useGameStateSocket(code, token);
 
   const handleKick = (playerId: string) => {
     socket.emit("kick", { code, kickUserId: playerId });
@@ -36,7 +43,20 @@ const Lobby: React.FC = () => {
     setShowEndModal(false);
   };
 
-  if (!gameState) return;
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="50vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!gameState) return <NoGameFound />;
 
   return (
     <>

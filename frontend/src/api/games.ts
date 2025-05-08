@@ -30,12 +30,14 @@ export const verifyGameCode = async (code: string, token: string) => {
 
 export const useGameStateSocket = (code: string, token: string) => {
   const [gameState, setGameState] = useState<GameState>();
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!code) return;
     socket.on("game-updated", (updatedGameState: GameState) => {
       setGameState(updatedGameState);
+      setLoading(false);
     });
     socket.on("kicked", () => {
       navigate("/hub");
@@ -49,5 +51,5 @@ export const useGameStateSocket = (code: string, token: string) => {
     };
   }, []);
 
-  return { gameState };
+  return { gameState, loading };
 };

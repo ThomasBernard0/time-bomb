@@ -41,7 +41,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<void> {
     const { token, code, name } = data;
     const user = await this.authService.validateToken(token);
-    if (!user) {
+    if (!user || !this.gameService.verifyGameCode(code)) {
       return;
     }
     const userId = user.id;
