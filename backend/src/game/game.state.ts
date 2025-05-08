@@ -38,6 +38,7 @@ export class GameState {
   round: number;
   foundWireCards: number;
   status: string;
+  statusUI: string;
   winner: Role;
 
   constructor(code: string) {

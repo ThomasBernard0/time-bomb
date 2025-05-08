@@ -100,6 +100,7 @@ export class GameService {
     const game: GameState = this.getGame(code);
     if (!game) return;
     game.status = 'in-progress';
+    game.statusUI = 'in-progress';
     game.round = 1;
     game.revealed = 0;
     game.foundWireCards = 0;
@@ -213,6 +214,18 @@ export class GameService {
     return game.revealed == game.players.length && game.status != 'ended';
   }
 
+  isEndOfGame(code: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    return game.status === 'ended';
+  }
+
+  setEndGameStatusUI(code: string): void {
+    const game: GameState = this.getGame(code);
+    if (!game) return;
+    game.statusUI = 'ended';
+  }
+
   handleReveal(code: string, cardId: string): boolean {
     const game: GameState = this.getGame(code);
     if (!game) return false;
@@ -250,7 +263,7 @@ export class GameService {
     if (!game) return null;
     return {
       code: game.code,
-      status: game.status,
+      status: game.statusUI,
       winner: game.winner,
       players: game.players.map((p) => ({
         id: p.id,

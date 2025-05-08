@@ -142,16 +142,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (
       !this.gameService.isPlayerTurn(code, userId) ||
       !this.gameService.isOpponentCard(code, userId, cardId) ||
-      this.gameService.isEndOfRound(code)
+      this.gameService.isEndOfRound(code) ||
+      this.gameService.isEndOfGame(code)
     )
       return;
 
     const isEndOfRound = this.gameService.handleReveal(code, cardId);
     this.emitGameState(code);
 
+    if (this.gameService.isEndOfGame(code)) {
+      setTimeout(() => {
+        this.gameService.setEndGameStatusUI(code);
+        this.emitGameState(code);
+      }, 2000);
+      return;
+    }
+
     if (isEndOfRound) {
       setTimeout(() => {
         this.gameService.handleEndOfRound(code);
+        if (this.gameService.isEndOfGame(code)) {
+          this.gameService.setEndGameStatusUI(code);
+        }
         this.emitGameState(code);
       }, 2000);
     }
