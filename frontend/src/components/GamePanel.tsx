@@ -4,8 +4,17 @@ import CardDisplayer from "./CardDisplayer";
 import RoleCard from "./RoleDisplayer";
 import NameDisplayer from "./NameDisplayer";
 import WireCounter from "./WireCounter";
+import { useEffect, useState } from "react";
 
 const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
+  const [distributionId, setDistributionId] = useState<number>(0);
+
+  useEffect(() => {
+    if (gameState.shouldRedistribute) {
+      setDistributionId((id) => id + 1);
+    }
+  }, [gameState.shouldRedistribute]);
+
   const getPlayerCards = () => {
     return gameState?.cards.filter(
       (card) => card.ownerId == gameState.player.id
@@ -50,12 +59,14 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         }}
       >
         <Box display="flex" gap={1}>
-          {playerCards.map((c) => (
+          {playerCards.map((c, idx) => (
             <CardDisplayer
               key={c.id}
               card={c}
               playerId={gameState.player.id}
               code={gameState.code}
+              delay={idx * 0.2}
+              distributionId={distributionId}
             />
           ))}
         </Box>
@@ -85,12 +96,14 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
               isTurn={player.id == gameState.playerTurnId}
             />
             <Box display="flex" gap={1}>
-              {cards.map((c) => (
+              {cards.map((c, idx) => (
                 <CardDisplayer
                   key={c.id}
                   card={c}
                   playerId={gameState.player.id}
                   code={gameState.code}
+                  delay={idx * 0.2}
+                  distributionId={distributionId}
                 />
               ))}
             </Box>

@@ -14,6 +14,7 @@ export type GameState = {
   players: Player[];
   player: Player;
   playerTurnId: string;
+  shouldRedistribute: boolean;
   cards: Card[];
   foundWireCards: number;
 };

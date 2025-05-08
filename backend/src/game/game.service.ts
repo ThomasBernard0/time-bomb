@@ -190,7 +190,7 @@ export class GameService {
     const game: GameState = this.getGame(code);
     if (!game) return false;
     const numberOfPlayers: number = game.players.length;
-    return numberOfPlayers >= 4 && numberOfPlayers <= 8;
+    return numberOfPlayers >= 2 && numberOfPlayers <= 8;
   }
 
   isPlayerTurn(code: string, playerId: string): boolean {
@@ -261,6 +261,7 @@ export class GameService {
       })),
       player: game.players.find((p) => p.id == userId),
       playerTurnId: game.playerTurnId,
+      shouldRedistribute: game.revealed == 0,
       foundWireCards: game.foundWireCards,
       cards: game.cards.map((card) => {
         if (card.revealed || card.ownerId === userId) {
