@@ -7,7 +7,9 @@ const CardDisplayer: React.FC<{
   card: Card;
   playerId: string;
   code: string;
-}> = ({ card, playerId, code }) => {
+  delay: number;
+  distributionId: number;
+}> = ({ card, playerId, code, delay, distributionId }) => {
   const handleClick = () => {
     socket.emit("reveal-card", { code, cardId: card.id });
   };
@@ -18,57 +20,84 @@ const CardDisplayer: React.FC<{
     return "/images/card/empty.png";
   };
   return (
-    <Box
-      width={70}
-      height={105}
-      onClick={handleClick}
-      sx={{ cursor: "pointer", perspective: "1000px" }}
+    <motion.div
+      key={`${distributionId}-${card.id}`}
+      initial={{
+        opacity: 0,
+        scale: 0.2,
+        translateX: "50vw",
+        translateY: "-50vh",
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        translateX: 0,
+        translateY: 0,
+      }}
+      transition={{
+        delay,
+        duration: 0.6,
+        type: "spring",
+        damping: 20,
+        stiffness: 100,
+      }}
     >
-      <motion.div
-        style={{
-          width: "100%",
-          height: "100%",
-          borderRadius: 8,
-          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-          transformStyle: "preserve-3d",
-        }}
-        animate={{ rotateY: card.revealed ? 180 : 0 }}
-        transition={{ duration: 0.6 }}
+      <Box
+        width={70}
+        height={105}
+        onClick={handleClick}
+        sx={{ cursor: "pointer", perspective: "1000px" }}
       >
-        <Box
-          component="img"
-          src={card.ownerId == playerId ? getImage() : "/images/card/back.png"}
-          alt="front-card"
-          width="100%"
-          height="100%"
-          borderRadius={2}
-          sx={{
-            objectFit: "cover",
-            backfaceVisibility: "hidden",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 2,
+        <motion.div
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: 8,
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+            transformStyle: "preserve-3d",
           }}
-        />
-        <Box
-          component="img"
-          src={card.ownerId == playerId ? "/images/card/back.png" : getImage()}
-          alt="back-card"
-          width="100%"
-          height="100%"
-          borderRadius={2}
-          sx={{
-            objectFit: "cover",
-            backfaceVisibility: "hidden",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            transform: "rotateY(180deg)",
-          }}
-        />
-      </motion.div>
-    </Box>
+          animate={{ rotateY: card.revealed ? 180 : 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Box
+            component="img"
+            src={
+              card.ownerId == playerId ? getImage() : "/images/card/back.png"
+            }
+            alt="front-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              zIndex: 2,
+            }}
+          />
+          <Box
+            component="img"
+            src={
+              card.ownerId == playerId ? "/images/card/back.png" : getImage()
+            }
+            alt="back-card"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+              backfaceVisibility: "hidden",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              transform: "rotateY(180deg)",
+            }}
+          />
+        </motion.div>
+      </Box>{" "}
+    </motion.div>
   );
 };
 
