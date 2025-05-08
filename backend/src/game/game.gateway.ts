@@ -124,7 +124,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleStartGame(socket: Socket, data: { code: string }): void {
     const { code } = data;
     const userId = this.biMap.getFromSocket(socket.id);
-    if (!this.gameService.isPlayerHost(code, userId)) return;
+    if (
+      !this.gameService.isPlayerHost(code, userId) ||
+      !this.gameService.hasCorrectNumberOfPlayers(code)
+    )
+      return;
 
     this.gameService.startGame(code);
 

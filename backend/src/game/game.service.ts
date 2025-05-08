@@ -186,6 +186,13 @@ export class GameService {
     return player.host;
   }
 
+  hasCorrectNumberOfPlayers(code: string): boolean {
+    const game: GameState = this.getGame(code);
+    if (!game) return false;
+    const numberOfPlayers: number = game.players.length;
+    return numberOfPlayers >= 4 && numberOfPlayers <= 8;
+  }
+
   isPlayerTurn(code: string, playerId: string): boolean {
     const game: GameState = this.getGame(code);
     if (!game) return false;

@@ -77,7 +77,9 @@ const Lobby: React.FC = () => {
               <Button
                 variant="contained"
                 onClick={handleStartGame}
-                disabled={gameState.players.length < 2}
+                disabled={
+                  gameState.players.length < 2 || !gameState.player.host
+                }
               >
                 Commencer la partie
               </Button>
