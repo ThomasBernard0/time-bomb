@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createGame, verifyGameCode } from "../api/games";
-import { Button, TextField, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Stack,
+  Typography,
+  Paper,
+  Container,
+} from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
 const Hub: React.FC = () => {
@@ -40,40 +47,44 @@ const Hub: React.FC = () => {
   };
 
   return (
-    <Stack spacing={3} alignItems="center" mt={8}>
-      <Typography variant="h4">Bienvenue dans Time Bomb 💣</Typography>
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
+        <Stack spacing={3} alignItems="center">
+          <Typography variant="h4">Bienvenue dans Time Bomb 💣</Typography>
 
-      <TextField
-        label="Nom"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+          <TextField
+            label="Nom"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={!username}
-        onClick={handleCreateGame}
-      >
-        Créer une partie
-      </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!username}
+            onClick={handleCreateGame}
+          >
+            Créer une partie
+          </Button>
 
-      <TextField
-        label="Code de partie"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={!code || !username}
-        onClick={handleJoinGame}
-      >
-        Rejoindre
-      </Button>
+          <TextField
+            label="Code de partie"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!code || !username}
+            onClick={handleJoinGame}
+          >
+            Rejoindre
+          </Button>
 
-      {error && <Typography color="error">{error}</Typography>}
-    </Stack>
+          {error && <Typography color="error">{error}</Typography>}
+        </Stack>
+      </Paper>
+    </Container>
   );
 };
 export default Hub;
