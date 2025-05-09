@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Paper, Stack } from "@mui/material";
 import { Card, GameState } from "../types";
 import CardDisplayer from "./CardDisplayer";
 import RoleCard from "./RoleDisplayer";
@@ -54,26 +54,30 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         position="absolute"
         sx={{
           left: "50%",
-          top: "80%",
+          top: "76%",
           transform: `translateX(-50%)`,
         }}
       >
-        <Box display="flex" gap={1}>
-          {playerCards.map((c, idx) => (
-            <CardDisplayer
-              key={c.id}
-              card={c}
-              playerId={gameState.player.id}
-              code={gameState.code}
-              delay={idx * 0.2}
-              distributionId={distributionId}
+        <Paper elevation={3} sx={{ p: 2, bgcolor: "grey.200" }}>
+          <Stack spacing={2}>
+            <Box display="flex" gap={1}>
+              {playerCards.map((c, idx) => (
+                <CardDisplayer
+                  key={c.id}
+                  card={c}
+                  playerId={gameState.player.id}
+                  code={gameState.code}
+                  delay={idx * 0.2}
+                  distributionId={distributionId}
+                />
+              ))}
+            </Box>
+            <NameDisplayer
+              player={gameState.player}
+              isTurn={gameState.player.id == gameState.playerTurnId}
             />
-          ))}
-        </Box>
-        <NameDisplayer
-          player={gameState.player}
-          isTurn={gameState.player.id == gameState.playerTurnId}
-        />
+          </Stack>
+        </Paper>
       </Box>
 
       {Object.entries(otherPlayersCards).map(([ownerId, cards], idx) => {
@@ -91,22 +95,26 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
               transform: `translate(-50%, 100%)`,
             }}
           >
-            <NameDisplayer
-              player={player}
-              isTurn={player.id == gameState.playerTurnId}
-            />
-            <Box display="flex" gap={1}>
-              {cards.map((c, idx) => (
-                <CardDisplayer
-                  key={c.id}
-                  card={c}
-                  playerId={gameState.player.id}
-                  code={gameState.code}
-                  delay={idx * 0.2}
-                  distributionId={distributionId}
+            <Paper elevation={3} sx={{ p: 2, bgcolor: "grey.200" }}>
+              <Stack spacing={2}>
+                <NameDisplayer
+                  player={player}
+                  isTurn={player.id == gameState.playerTurnId}
                 />
-              ))}
-            </Box>
+                <Box display="flex" gap={1}>
+                  {cards.map((c, idx) => (
+                    <CardDisplayer
+                      key={c.id}
+                      card={c}
+                      playerId={gameState.player.id}
+                      code={gameState.code}
+                      delay={idx * 0.2}
+                      distributionId={distributionId}
+                    />
+                  ))}
+                </Box>
+              </Stack>
+            </Paper>
           </Box>
         );
       })}

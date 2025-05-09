@@ -20,9 +20,8 @@ const NameDisplayer: React.FC<{
           alignItems: "center",
           gap: "10px",
           bgcolor: "lightgrey",
-          m: "16px",
-          paddingY: "8px",
-          paddingX: "32px",
+          height: "64px",
+          width: "200px",
           border: "solid 1px black",
           borderRadius: "8px",
         }}
