@@ -77,8 +77,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId = this.biMap.getFromSocket(socket.id);
     if (!userId) return;
 
-    this.gameService.removePlayer(code, userId);
-    this.biMap.deleteGameFromUser(userId, code);
+    this.gameService.setOffline(code, userId);
     this.handleDeleteGame(code);
 
     this.emitGameState(code);
@@ -95,7 +94,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const kickSocketValue = this.biMap.getFromUser(kickUserId);
     if (kickSocketValue) {
       this.kick(kickSocketValue.socketId, code);
-      this.biMap.deleteGameFromUser(kickUserId, code);
       this.handleDeleteGame(code);
     }
 
