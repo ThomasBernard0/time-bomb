@@ -14,7 +14,6 @@ const PlayerCard: React.FC<{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: 1,
       }}
     >
       <CardContent sx={{ flex: 1 }}>

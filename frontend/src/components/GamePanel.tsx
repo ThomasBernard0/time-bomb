@@ -41,7 +41,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const n = Object.keys(otherPlayersCards).length;
   const radius = 0.4;
   const centerX = 0.5;
-  const centerY = 0.5;
+  const centerY = 0.42;
   const totalAngle = (Math.PI * 5) / 6;
   const startAngle = Math.PI / 2 + totalAngle / 2;
   const step = totalAngle / (n > 1 ? n - 1 : 1);
@@ -83,8 +83,8 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
       {Object.entries(otherPlayersCards).map(([ownerId, cards], idx) => {
         const player = gameState!.players.find((p) => p.id === ownerId)!;
         const angle = angles[idx];
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY - radius * 1.5 * Math.sin(angle);
+        const x = centerX + radius * 1.05 * Math.cos(angle);
+        const y = centerY - radius * 2.1 * Math.sin(angle) + 0.25;
         return (
           <Box
             key={player.id}
@@ -95,7 +95,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
               transform: `translate(-50%, 100%)`,
             }}
           >
-            <Paper elevation={3} sx={{ p: 2, bgcolor: "grey.200" }}>
+            <Paper elevation={3} sx={{ p: 1, bgcolor: "grey.200" }}>
               <Stack spacing={2}>
                 <NameDisplayer
                   player={player}

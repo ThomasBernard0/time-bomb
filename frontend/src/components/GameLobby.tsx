@@ -40,7 +40,11 @@ const GameLobby: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             <Button
               variant="contained"
               onClick={handleStartGame}
-              disabled={gameState.players.length < 2 || !gameState.player.host}
+              disabled={
+                gameState.players.length < 4 ||
+                gameState.players.length > 8 ||
+                !gameState.player.host
+              }
             >
               Commencer la partie
             </Button>
