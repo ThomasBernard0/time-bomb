@@ -13,9 +13,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Hub: React.FC = () => {
   const { token } = useAuth();
-  const [username, setUsername] = useState(
-    () => localStorage.getItem("username") || ""
-  );
+  const [name, setName] = useState(() => localStorage.getItem("name") || "");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -24,7 +22,7 @@ const Hub: React.FC = () => {
     if (!token) return;
     try {
       const code = await createGame(token);
-      localStorage.setItem("username", username);
+      localStorage.setItem("name", name);
       navigate(`/lobby/${code}`);
     } catch (err) {
       setError("Erreur lors de la création de la partie.");
@@ -36,7 +34,7 @@ const Hub: React.FC = () => {
     try {
       const exists = await verifyGameCode(code, token);
       if (exists) {
-        localStorage.setItem("username", username);
+        localStorage.setItem("name", name);
         navigate(`/lobby/${code}`);
       } else {
         setError("Code de partie invalide.");
@@ -54,14 +52,14 @@ const Hub: React.FC = () => {
 
           <TextField
             label="Nom"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
 
           <Button
             variant="contained"
             color="primary"
-            disabled={!username}
+            disabled={!name}
             onClick={handleCreateGame}
           >
             Créer une partie
@@ -75,7 +73,7 @@ const Hub: React.FC = () => {
           <Button
             variant="contained"
             color="primary"
-            disabled={!code || !username}
+            disabled={!code || !name}
             onClick={handleJoinGame}
           >
             Rejoindre
