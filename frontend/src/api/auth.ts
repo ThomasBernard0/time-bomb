@@ -3,20 +3,23 @@ import axios from "axios";
 const BASE_URL = "http://localhost:3000";
 
 export const postRegister = async (
-  email: string,
+  username: string,
   password: string
 ): Promise<any> => {
   const res = await axios.post(`${BASE_URL}/auth/register`, {
-    email,
+    username,
     password,
   });
   return res;
 };
 
 export const postLogin = async (
-  email: string,
+  username: string,
   password: string
 ): Promise<any> => {
-  const res = await axios.post(`${BASE_URL}/auth/login`, { email, password });
+  const res = await axios.post(`${BASE_URL}/auth/login`, {
+    username,
+    password,
+  });
   return res;
 };

@@ -26,8 +26,3 @@ export type Player = {
   host: boolean;
   role: string;
 };
-
-export type User = {
-  id: string;
-  email: string;
-};

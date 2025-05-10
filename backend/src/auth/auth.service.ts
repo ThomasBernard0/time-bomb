@@ -10,8 +10,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.usersService.findByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -20,19 +20,19 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async register(email: string, password: string) {
-    const existingUser = await this.usersService.findByEmail(email);
+  async register(username: string, password: string) {
+    const existingUser = await this.usersService.findByUsername(username);
     if (existingUser) {
-      throw new ForbiddenException('Email already in use');
+      throw new ForbiddenException('Username already in use');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.usersService.create(email, hashedPassword);
+    const user = await this.usersService.create(username, hashedPassword);
     return this.login(user);
   }
 
