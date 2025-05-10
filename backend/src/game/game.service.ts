@@ -101,6 +101,7 @@ export class GameService {
     if (!game) return;
     game.status = 'in-progress';
     game.statusUI = 'in-progress';
+    game.winner = null;
     game.round = 1;
     game.revealed = 0;
     game.foundWireCards = 0;
@@ -264,7 +265,12 @@ export class GameService {
     return {
       code: game.code,
       status: game.statusUI,
-      winner: game.winner,
+      winner: game.winner
+        ? {
+            role: game.winner,
+            players: game.players.filter((p) => (p.role = game.winner)),
+          }
+        : null,
       players: game.players.map((p) => ({
         id: p.id,
         name: p.name,

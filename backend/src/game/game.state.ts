@@ -20,7 +20,7 @@ export type Player = {
 export type GameStateUI = {
   code: string;
   status: string;
-  winner: string;
+  winner: { role: string; players: Player[] };
   players: Player[];
   player: Player;
   playerTurnId: string;

@@ -10,7 +10,7 @@ export interface Card {
 export type GameState = {
   code: string;
   status: string;
-  winner: string;
+  winner: { role: string; players: Player[] };
   players: Player[];
   player: Player;
   playerTurnId: string;

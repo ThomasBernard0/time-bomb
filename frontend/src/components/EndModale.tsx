@@ -1,4 +1,5 @@
-import { Box, Modal, Typography } from "@mui/material";
+import { Box, Modal, Stack, Typography } from "@mui/material";
+import { Player } from "../types";
 
 type EndModaleProps = {
   showEndModal: boolean;
@@ -11,6 +12,7 @@ const EndModale: React.FC<EndModaleProps> = ({
   gameState,
   closeModale,
 }) => {
+  if (!gameState.winner) return;
   return (
     <Modal
       open={showEndModal}
@@ -31,12 +33,32 @@ const EndModale: React.FC<EndModaleProps> = ({
           p: 4,
         }}
       >
-        <Typography id="modal-title" variant="h5" gutterBottom>
-          🎉 Partie terminée !
-        </Typography>
-        <Typography id="modal-description" sx={{ mb: 2 }}>
-          L’équipe gagnante est : <strong>{gameState.winner}</strong>
-        </Typography>
+        <Stack spacing={3} alignItems="center">
+          <Typography id="modal-title" variant="h5" gutterBottom>
+            🎉 Partie terminée !
+          </Typography>
+          <Box
+            component="img"
+            src={
+              gameState.winner.role == "sherlock"
+                ? "/images/role/sherlock.png"
+                : "/images/role/moriarty.png"
+            }
+            alt="winner_role"
+            width="100%"
+            height="100%"
+            borderRadius={2}
+            sx={{
+              objectFit: "cover",
+            }}
+          />
+          <Box id="modal-description" sx={{ mb: 2 }}></Box>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            {gameState.winner.players.map((player: Player) => (
+              <Typography>{player.name}</Typography>
+            ))}
+          </Box>
+        </Stack>
       </Box>
     </Modal>
   );
