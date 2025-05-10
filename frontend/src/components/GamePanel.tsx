@@ -58,9 +58,9 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
           transform: `translateX(-50%)`,
         }}
       >
-        <Paper elevation={3} sx={{ p: 2, bgcolor: "grey.200" }}>
+        <Paper elevation={3} sx={{ p: 1, bgcolor: "grey.200" }}>
           <Stack spacing={2}>
-            <Box display="flex" gap={1}>
+            <Box display="flex" justifyContent="center" gap={1}>
               {playerCards.map((c, idx) => (
                 <CardDisplayer
                   key={c.id}
@@ -101,7 +101,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
                   player={player}
                   isTurn={player.id == gameState.playerTurnId}
                 />
-                <Box display="flex" gap={1}>
+                <Box display="flex" justifyContent="center" gap={1}>
                   {cards.map((c, idx) => (
                     <CardDisplayer
                       key={c.id}

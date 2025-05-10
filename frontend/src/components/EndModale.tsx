@@ -52,7 +52,9 @@ const EndModale: React.FC<EndModaleProps> = ({
               objectFit: "cover",
             }}
           />
-          <Box id="modal-description" sx={{ mb: 2 }}></Box>
+          <Box id="modal-description" sx={{ mb: 2 }}>
+            <Typography>Les gagnants sont :</Typography>
+          </Box>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             {gameState.winner.players.map((player: Player) => (
               <Typography>{player.name}</Typography>
