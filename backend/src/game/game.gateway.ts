@@ -151,6 +151,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (this.gameService.isEndOfGame(code)) {
       setTimeout(() => {
         this.gameService.setEndGameStatusUI(code);
+        this.gameService.createGameDB(code);
         this.emitGameState(code);
       }, 2000);
       return;
@@ -161,6 +162,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameService.handleEndOfRound(code);
         if (this.gameService.isEndOfGame(code)) {
           this.gameService.setEndGameStatusUI(code);
+          this.gameService.createGameDB(code);
         }
         this.emitGameState(code);
       }, 2000);
