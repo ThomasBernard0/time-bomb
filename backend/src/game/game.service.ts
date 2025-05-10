@@ -268,7 +268,7 @@ export class GameService {
       winner: game.winner
         ? {
             role: game.winner,
-            players: game.players.filter((p) => (p.role = game.winner)),
+            players: game.players.filter((p) => p.role === game.winner),
           }
         : null,
       players: game.players.map((p) => ({
