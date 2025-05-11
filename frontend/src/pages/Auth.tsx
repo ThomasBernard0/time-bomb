@@ -17,17 +17,21 @@ export default function AuthPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (username.length < 6) {
+      setError("Le nom d'utilisateur doit contenir au moins 6 caractères.");
+      return;
+    }
     try {
       const res = isRegister
-        ? await postRegister(email, password)
-        : await postLogin(email, password);
+        ? await postRegister(username, password)
+        : await postLogin(username, password);
       const token = res.data.access_token;
       login(token);
       navigate("/hub");
@@ -52,10 +56,10 @@ export default function AuthPage() {
           <TextField
             fullWidth
             margin="normal"
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label="Username"
+            type="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
 

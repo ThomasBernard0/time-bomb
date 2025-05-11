@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
@@ -27,6 +31,9 @@ export class AuthService {
   }
 
   async register(username: string, password: string) {
+    if (username.length < 6) {
+      throw new BadRequestException('Username must be at least 6 characters');
+    }
     const existingUser = await this.usersService.findByUsername(username);
     if (existingUser) {
       throw new ForbiddenException('Username already in use');
