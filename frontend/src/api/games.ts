@@ -4,7 +4,7 @@ import { GameState } from "../types";
 import socket from "../socket";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:3000/api";
 
 export const createGame = async (token: string): Promise<{ code: string }> => {
   const res = await axios.get(`${BASE_URL}/games`, {
