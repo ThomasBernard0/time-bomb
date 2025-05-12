@@ -1,5 +1,5 @@
 # ---- Frontend Build Stage ----
-FROM node:18-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 # Copy package files and install dependencies
@@ -14,7 +14,7 @@ RUN npm run build
 # The build output is typically in 'dist' or 'build' folder inside /app/frontend/
 
 # ---- Backend Build Stage ----
-FROM node:18-alpine AS backend-builder
+FROM node:22-alpine AS backend-builder
 WORKDIR /app/backend
 
 # Copy package files and install dependencies (including dev for build)
@@ -24,12 +24,14 @@ RUN npm ci
 # Copy the rest of the backend code
 COPY backend/ ./
 
+RUN npx prisma generate
+
 # Build the backend
 RUN npm run build
 # The build output is typically in 'dist' folder inside /app/backend/
 
 # ---- Production Stage ----
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 WORKDIR /app
 
 # Set NODE_ENV to production
@@ -40,10 +42,11 @@ RUN mkdir -p backend
 
 # Copy backend package files and install *only* production dependencies
 COPY backend/package.json backend/package-lock.json* ./backend/
-RUN cd backend && npm ci --only=production
+RUN cd backend && npm ci
 
 # Copy built backend from the backend-builder stage
 COPY --from=backend-builder /app/backend/dist ./backend/dist
+COPY --from=backend-builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 
 # Copy built frontend from the frontend-builder stage
 # We'll assume NestJS will serve static files from a 'public' directory
