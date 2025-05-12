@@ -49,6 +49,8 @@ RUN cd backend && npm ci
 COPY --from=backend-builder /app/backend/dist ./backend/dist
 COPY --from=backend-builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 
+RUN npx prisma db push
+
 # Copy built frontend from the frontend-builder stage
 # We'll assume NestJS will serve static files from a 'public' directory
 # relative to the backend's root (which will be /app/backend at runtime)
