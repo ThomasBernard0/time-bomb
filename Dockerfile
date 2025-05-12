@@ -63,4 +63,4 @@ EXPOSE 3000
 
 # Command to run the backend application
 # Adjust 'backend/dist/main.js' if your entry point is different
-CMD ["npx", "prisma", "db", "push","&&","node", "backend/dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy &&", "node", "backend/dist/main.js"]
