@@ -4,10 +4,10 @@ import { GameState } from "../types";
 import socket from "../socket";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const createGame = async (token: string): Promise<{ code: string }> => {
-  const res = await axios.get(`${BASE_URL}/games`, {
+  const res = await axios.get(`${BASE_URL}/api/games`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -17,7 +17,7 @@ export const createGame = async (token: string): Promise<{ code: string }> => {
 
 export const verifyGameCode = async (code: string, token: string) => {
   try {
-    const response = await axios.get(`${BASE_URL}/games/verify/${code}`, {
+    const response = await axios.get(`${BASE_URL}/api/games/verify/${code}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
