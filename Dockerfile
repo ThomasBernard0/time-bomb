@@ -37,6 +37,7 @@ WORKDIR /app
 
 # Set NODE_ENV to production
 ENV NODE_ENV=production
+ENV DATABASE_URL=file:./dev.db
 
 # Create a directory for the backend
 RUN mkdir -p backend
@@ -49,6 +50,7 @@ RUN cd backend && npm ci
 COPY --from=backend-builder /app/backend/dist ./backend/dist
 COPY --from=backend-builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 
+COPY --from=backend-builder /app/backend/prisma ./
 RUN npx prisma db push
 
 # Copy built frontend from the frontend-builder stage
