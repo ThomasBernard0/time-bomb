@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export const postRegister = async (
   username: string,
   password: string
 ): Promise<any> => {
-  const res = await axios.post(`${BASE_URL}/api/auth/register`, {
+  const res = await axios.post(`/api/auth/register`, {
     username,
     password,
   });
@@ -17,7 +15,7 @@ export const postLogin = async (
   username: string,
   password: string
 ): Promise<any> => {
-  const res = await axios.post(`${BASE_URL}/api/auth/login`, {
+  const res = await axios.post(`/api/auth/login`, {
     username,
     password,
   });
