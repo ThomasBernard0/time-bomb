@@ -51,7 +51,6 @@ COPY --from=backend-builder /app/backend/dist ./backend/dist
 COPY --from=backend-builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 
 COPY --from=backend-builder /app/backend/prisma ./
-RUN npx prisma db push
 
 # Copy built frontend from the frontend-builder stage
 # We'll assume NestJS will serve static files from a 'public' directory
@@ -64,4 +63,4 @@ EXPOSE 3000
 
 # Command to run the backend application
 # Adjust 'backend/dist/main.js' if your entry point is different
-CMD ["node", "backend/dist/main.js"]
+CMD ["npx", "prisma", "db", "push","&&","node", "backend/dist/main.js"]
