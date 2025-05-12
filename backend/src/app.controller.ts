@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { join } from 'path';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor() {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('*')
+  serveClient(@Req() req: any, @Res() res: any) {
+    if (req.originalUrl.startsWith('/api/')) {
+      res.status(404).json({ message: 'API route not found' });
+      return;
+    }
+
+    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
   }
 }
