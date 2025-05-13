@@ -56,7 +56,6 @@ COPY --from=backend-builder /app/backend/prisma ./backend/prisma
 # relative to the backend's root (which will be /app/backend at runtime)
 RUN mkdir -p ./backend/static
 COPY --from=frontend-builder /app/frontend/dist ./backend/static
-COPY --from=frontend-builder /app/frontend/public ./backend/static
 
 # Expose the port the backend runs on
 EXPOSE 3000
