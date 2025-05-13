@@ -37,7 +37,6 @@ WORKDIR /app
 
 # Set NODE_ENV to production
 ENV NODE_ENV=production
-ENV DATABASE_URL=file:./dev.db
 
 # Create a directory for the backend
 RUN mkdir -p backend
@@ -50,7 +49,7 @@ RUN cd backend && npm ci
 COPY --from=backend-builder /app/backend/dist ./backend/dist
 COPY --from=backend-builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 
-COPY --from=backend-builder /app/backend/prisma ./
+COPY --from=backend-builder /app/backend/prisma ./backend/prisma
 
 # Copy built frontend from the frontend-builder stage
 # We'll assume NestJS will serve static files from a 'public' directory
@@ -63,4 +62,4 @@ EXPOSE 3000
 
 # Command to run the backend application
 # Adjust 'backend/dist/main.js' if your entry point is different
-CMD ["sh", "-c", "npx prisma migrate deploy && node backend/dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/main.js"]
