@@ -16,12 +16,6 @@ export class GameService {
 
   private games: Map<string, GameState> = new Map();
 
-  test(code: string): any {
-    const gameState: GameState = this.getGameState(code);
-    if (!gameState) return;
-    return gameState;
-  }
-
   async createGameDB(code: string): Promise<Game> {
     const gameState: GameState = this.getGameState(code);
     if (!gameState) return;

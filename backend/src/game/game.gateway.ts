@@ -46,11 +46,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const userId = user.id;
 
-    console.log('code');
-    console.log(code);
-    console.log('name');
-    console.log(name);
-
     if (this.biMap.hasUser(userId)) {
       const oldSocketId = this.biMap.getFromUser(userId).socketId;
       if (oldSocketId != socket.id) {
@@ -176,7 +171,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async emitGameState(code: string): Promise<void> {
     const sockets = await this.server.in(code).fetchSockets();
-    console.log(this.gameService.test(code));
     sockets.forEach((socket) => {
       socket.emit(
         'game-updated',

@@ -40,8 +40,8 @@ export const useGameStateSocket = (code: string, token: string) => {
     socket.on("kicked", () => {
       navigate("/hub");
     });
-    const username = localStorage.getItem("username");
-    socket.emit("join-game", { code, token, name: username });
+    const name = localStorage.getItem("name");
+    socket.emit("join-game", { code, token, name });
     return () => {
       socket.emit("leave-game", { code });
       socket.off("game-updated");
