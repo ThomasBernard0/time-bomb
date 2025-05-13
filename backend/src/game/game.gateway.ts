@@ -171,6 +171,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async emitGameState(code: string): Promise<void> {
     const sockets = await this.server.in(code).fetchSockets();
+    console.log(this.gameService.test(code));
     sockets.forEach((socket) => {
       socket.emit(
         'game-updated',
