@@ -49,18 +49,18 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   const angles = Array.from({ length: n }, (_, i) => startAngle - i * step);
 
   return (
-    <Box position="relative" width="100%" height="94vh" overflow="hidden">
+    <Box position="relative" width="100%" height="100vh" overflow="hidden">
       <Box
         position="absolute"
         sx={{
           left: "50%",
-          top: "76%",
+          top: "79%",
           transform: `translateX(-50%)`,
         }}
       >
         <Paper elevation={3} sx={{ p: 1, bgcolor: "grey.200" }}>
-          <Stack spacing={2}>
-            <Box display="flex" justifyContent="center" gap={1}>
+          <Stack spacing={1}>
+            <Box display="flex" justifyContent="center" gap={0.5}>
               {playerCards.map((c, idx) => (
                 <CardDisplayer
                   key={c.id}
@@ -84,7 +84,7 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
         const player = gameState!.players.find((p) => p.id === ownerId)!;
         const angle = angles[idx];
         const x = centerX + radius * 1.05 * Math.cos(angle);
-        const y = centerY - radius * 2.1 * Math.sin(angle) + 0.25;
+        const y = centerY - radius * 2 * Math.sin(angle) + 0.2;
         return (
           <Box
             key={player.id}
@@ -96,12 +96,12 @@ const GamePanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
             }}
           >
             <Paper elevation={3} sx={{ p: 1, bgcolor: "grey.200" }}>
-              <Stack spacing={2}>
+              <Stack spacing={1}>
                 <NameDisplayer
                   player={player}
                   isTurn={player.id == gameState.playerTurnId}
                 />
-                <Box display="flex" justifyContent="center" gap={1}>
+                <Box display="flex" justifyContent="center" gap={0.5}>
                   {cards.map((c, idx) => (
                     <CardDisplayer
                       key={c.id}

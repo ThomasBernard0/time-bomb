@@ -2,7 +2,13 @@ import { Box, Typography } from "@mui/material";
 
 const WireCounter: React.FC<{ count: number }> = ({ count }) => {
   return (
-    <Box position="absolute" left={16} display="flex" alignItems="center">
+    <Box
+      position="absolute"
+      left={16}
+      top={16}
+      display="flex"
+      alignItems="center"
+    >
       <Box
         component="img"
         src="/images/card/wire.png"

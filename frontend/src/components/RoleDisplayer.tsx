@@ -21,7 +21,7 @@ const RoleCard: React.FC<{
   return (
     <Box
       position="absolute"
-      bottom={0}
+      bottom={16}
       left={16}
       width={100}
       height={150}

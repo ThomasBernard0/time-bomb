@@ -45,7 +45,7 @@ const Lobby: React.FC = () => {
 
   return (
     <>
-      <Stack spacing={3} alignItems="center" mt={5}>
+      <Stack spacing={3} alignItems="center">
         {gameState.status != "in-progress" ? (
           <GameLobby gameState={gameState} />
         ) : (
