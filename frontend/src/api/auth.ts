@@ -1,10 +1,10 @@
-import axios from "axios";
+import api from "./api";
 
 export const postRegister = async (
   username: string,
   password: string
 ): Promise<any> => {
-  const res = await axios.post(`/api/auth/register`, {
+  const res = await api.post(`/auth/register`, {
     username,
     password,
   });
@@ -15,7 +15,7 @@ export const postLogin = async (
   username: string,
   password: string
 ): Promise<any> => {
-  const res = await axios.post(`/api/auth/login`, {
+  const res = await api.post(`/auth/login`, {
     username,
     password,
   });

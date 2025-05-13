@@ -1,11 +1,11 @@
-import axios from "axios";
+import api from "./api";
 import { useEffect, useState } from "react";
 import { GameState } from "../types";
 import socket from "../socket";
 import { useNavigate } from "react-router-dom";
 
 export const createGame = async (token: string): Promise<{ code: string }> => {
-  const res = await axios.get(`/api/games`, {
+  const res = await api.get(`/games`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -15,7 +15,7 @@ export const createGame = async (token: string): Promise<{ code: string }> => {
 
 export const verifyGameCode = async (code: string, token: string) => {
   try {
-    const response = await axios.get(`/api/games/verify/${code}`, {
+    const response = await api.get(`/games/verify/${code}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
