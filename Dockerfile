@@ -54,9 +54,9 @@ COPY --from=backend-builder /app/backend/prisma ./backend/prisma
 # Copy built frontend from the frontend-builder stage
 # We'll assume NestJS will serve static files from a 'public' directory
 # relative to the backend's root (which will be /app/backend at runtime)
-RUN mkdir -p ./backend/public
-COPY --from=frontend-builder /app/frontend/dist ./backend/public
-COPY --from=frontend-builder frontend/public ./backend/public
+RUN mkdir -p ./backend/static
+COPY --from=frontend-builder /app/frontend/dist ./backend/static
+COPY --from=frontend-builder /app/frontend/public ./backend/static
 
 # Expose the port the backend runs on
 EXPOSE 3000

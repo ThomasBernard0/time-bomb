@@ -15,7 +15,7 @@ import { GameModule } from './game/game.module';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', 'static'),
       exclude: ['/api*'],
     }),
     GameModule,
